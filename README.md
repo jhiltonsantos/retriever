@@ -1,4 +1,4 @@
-# speech-code-api
+# SpeechCode API
 
 Backend FastAPI do assistente de estudos **speech-code** — RAG local para Programação e Inglês.
 
