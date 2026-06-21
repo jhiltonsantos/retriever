@@ -1,6 +1,6 @@
 # SpeechCode API
 
-Backend FastAPI do assistente de estudos **speech-code** — RAG local para Programação e Inglês.
+Backend FastAPI do assistente de estudos **SpeechCode** — RAG local para Programação e Inglês.
 
 ## Pré-requisitos
 
@@ -9,7 +9,7 @@ Backend FastAPI do assistente de estudos **speech-code** — RAG local para Prog
 - Modelos baixados: `llama3` e `nomic-embed-text`
 - Ambiente virtual em `.venv/` (já criado neste diretório)
 
-```powershell
+```shell
 ollama pull llama3
 ollama pull nomic-embed-text
 ```
@@ -68,15 +68,3 @@ speech-code-api/
   "answer": "Resposta contextual gerada pelo tutor..."
 }
 ```
-
-## Critérios de aceite (Fase 2)
-
-- [x] Ollama rodando com `llama3` e `nomic-embed-text`
-- [x] `POST /upload` com PDF retorna `chunks_indexed > 0`
-- [x] `POST /ask` responde com contexto do PDF enviado
-- [x] Dados persistem em `chroma_data/` após reiniciar a API
-- [x] `/docs` e CORS para `localhost:5173` funcionando
-
-## Próximos passos
-
-Na **Fase 3**, criar a UI SvelteKit em `speech-code-web/`. Consulte [../docs/roadmap.md](../docs/roadmap.md).
