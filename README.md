@@ -1,44 +1,46 @@
-# SpeechCode API
+# Retriever API
 
-Backend FastAPI do assistente de estudos **SpeechCode** — RAG local para Programação e Inglês.
+Backend FastAPI do assistente de estudos **Retriever** — RAG para Programação e Inglês, com banco vetorial local.
+
+Este submodule faz parte do monorepo [retriever](https://github.com/jhiltonsantos/retriever), onde vive a documentação completa.
 
 ## Pré-requisitos
 
-- Python 3.10+ (3.11+ recomendado)
-- [Ollama](https://ollama.com/download) rodando na bandeja do sistema
-- Modelos baixados: `llama3` e `nomic-embed-text`
-- Ambiente virtual em `.venv/` (já criado neste diretório)
+- Python 3.11 ou superior
+- [Ollama](https://ollama.com/download) rodando — obrigatório, os embeddings são sempre locais
+- Modelo de embeddings baixado
 
 ```shell
-ollama pull llama3
 ollama pull nomic-embed-text
 ```
+
+O `llama3` só é necessário para quem for usar o LLM local em vez de uma API remota.
 
 ## Como rodar
 
 ```shell
-cd speech-code-api
-.\.venv\Scripts\Activate.ps1
+source .venv/bin/activate      # Windows: .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 uvicorn main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 Documentação interativa: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-## Estrutura (Fase 2)
+## Estrutura
 
 ```
-speech-code-api/
-├── main.py                 # Bootstrap: create_app()
+retriever-api/
+├── main.py                 # bootstrap: create_app()
+├── desktop_entry.py        # entrypoint do executavel empacotado
 ├── app/
-│   ├── factory.py          # FastAPI + CORS + routers
-│   ├── config.py           # Ollama, ChromaDB, paths
-│   ├── dependencies.py     # Singletons LangChain
+│   ├── factory.py          # FastAPI, CORS, routers
+│   ├── config.py           # variaveis de ambiente e constantes
+│   ├── dependencies.py     # ponto unico de wiring
 │   ├── routers/            # health, upload, ask
 │   ├── services/           # pdf, ingest, rag
 │   └── prompts/            # system prompt do tutor
-├── chroma_data/            # persistência ChromaDB (gitignored)
-└── tmp_uploads/            # PDFs temporários (gitignored)
+├── chroma_data/            # persistencia ChromaDB, fora do versionamento
+└── tmp_uploads/            # PDFs temporarios, fora do versionamento
 ```
 
 ## Endpoints
@@ -46,12 +48,12 @@ speech-code-api/
 | Método | Rota | Descrição |
 |--------|------|-----------|
 | GET | `/health` | Health check |
-| POST | `/upload` | Ingestão de PDF → ChromaDB via LangChain |
-| POST | `/ask` | Pergunta com retrieval + `llama3` via Ollama |
+| POST | `/upload` | Ingestão de PDF no ChromaDB via LangChain |
+| POST | `/ask` | Pergunta com retrieval e geração |
 
 ### Respostas
 
-**POST /upload** (sucesso):
+**POST /upload**
 
 ```json
 {
@@ -61,10 +63,12 @@ speech-code-api/
 }
 ```
 
-**POST /ask** (sucesso):
+**POST /ask**
 
 ```json
 {
   "answer": "Resposta contextual gerada pelo tutor..."
 }
 ```
+
+O contrato completo, incluindo a evolução planejada, está em `docs/api-contract.md` no monorepo.

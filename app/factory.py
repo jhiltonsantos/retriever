@@ -7,7 +7,7 @@ from app.routers import ask, health, upload
 
 def create_app() -> FastAPI:
     app = FastAPI(
-        title="speech-code API",
+        title="Retriever API",
         description="Assistente de estudos local com RAG para Programação e Inglês",
         version="0.2.0",
     )

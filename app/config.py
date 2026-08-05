@@ -15,7 +15,7 @@ CHUNK_OVERLAP = 200
 RETRIEVER_K = 4
 
 API_PORT = int(os.getenv("API_PORT", "8000"))
-IS_DESKTOP = os.getenv("SPEECHCODE_DESKTOP", "0") == "1"
+IS_DESKTOP = os.getenv("DESKTOP_MODE", "0") == "1"
 
 CORS_ORIGINS = (
     ["*"]
