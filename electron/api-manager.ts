@@ -60,7 +60,7 @@ export async function startApiProcess(): Promise<ChildProcess> {
 	const env = {
 		...process.env,
 		API_PORT: DESKTOP_API_PORT,
-		SPEECHCODE_DESKTOP: '1',
+		DESKTOP_MODE: '1',
 		CHROMA_DIR: chromaDir,
 		TMP_UPLOAD_DIR: tmpDir
 	};

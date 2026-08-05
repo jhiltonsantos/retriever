@@ -9,7 +9,7 @@ export function getApiUrl(): string {
 }
 
 export function getUserDataDir(): string {
-	return path.join(app.getPath('appData'), 'SpeechCode');
+	return path.join(app.getPath('appData'), 'Retriever');
 }
 
 export function getChromaDir(): string {
@@ -20,18 +20,18 @@ export function getTmpUploadDir(): string {
 	return path.join(getUserDataDir(), 'tmp_uploads');
 }
 
-/** Dev: sibling speech-code-api. Prod: bundled under resources/api. */
+/** Dev: sibling retriever-api. Prod: bundled under resources/api. */
 export function resolveApiRoot(): string {
 	if (app.isPackaged) {
 		return path.join(process.resourcesPath, 'api');
 	}
 	const webRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-	return path.resolve(webRoot, '..', 'speech-code-api');
+	return path.resolve(webRoot, '..', 'retriever-api');
 }
 
 export function resolveApiExecutable(): string {
 	if (app.isPackaged) {
-		return path.join(process.resourcesPath, 'api', 'speechcode-api.exe');
+		return path.join(process.resourcesPath, 'api', 'retriever-api.exe');
 	}
 	return '';
 }

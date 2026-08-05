@@ -1,7 +1,7 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 
-export interface SpeechCodeDesktop {
+export interface RetrieverDesktop {
 	getApiUrl: () => string;
 	checkOllama: () => Promise<boolean>;
 	isDesktop: boolean;
@@ -17,7 +17,7 @@ declare global {
 	}
 
 	interface Window {
-		speechCode?: SpeechCodeDesktop;
+		retriever?: RetrieverDesktop;
 	}
 }
 

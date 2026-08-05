@@ -17,7 +17,7 @@ async function createWindow(): Promise<void> {
 		height: 800,
 		minWidth: 720,
 		minHeight: 600,
-		title: 'SpeechCode',
+		title: 'Retriever',
 		webPreferences: {
 			preload: path.join(__dirname, 'preload.cjs'),
 			contextIsolation: true,
@@ -74,4 +74,4 @@ process.on('exit', () => {
 	}
 });
 
-console.log('SpeechCode API:', getApiUrl());
+console.log('Retriever API:', getApiUrl());

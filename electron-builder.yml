@@ -1,5 +1,5 @@
-appId: com.speechcode.app
-productName: SpeechCode
+appId: com.retriever.app
+productName: Retriever
 directories:
   output: dist/desktop
   buildResources: static

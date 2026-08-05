@@ -20,8 +20,8 @@
 	let visible = $state(false);
 
 	onMount(async () => {
-		if (window.speechCode?.checkOllama) {
-			const ok = await window.speechCode.checkOllama();
+		if (window.retriever?.checkOllama) {
+			const ok = await window.retriever.checkOllama();
 			visible = !ok;
 			return;
 		}

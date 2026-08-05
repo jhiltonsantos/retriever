@@ -1,5 +1,5 @@
 <header class="text-center mb-8">
-	<h1 class="text-3xl font-bold tracking-tight m-0">SpeechCode</h1>
+	<h1 class="text-3xl font-bold tracking-tight m-0">Retriever</h1>
 	<p class="mt-2 mx-auto max-w-xl text-base-content/70">
 		Assistente de estudos pessoal · RAG para Engenharia de Software e Inglês
 	</p>

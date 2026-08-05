@@ -1,6 +1,6 @@
 import { emptyChatSession, type ChatSession } from './types';
 
-const STORAGE_KEY = 'speech-code:chat-history';
+const STORAGE_KEY = 'retriever:chat-history';
 
 export function loadChatSession(): ChatSession {
 	if (typeof window === 'undefined') {

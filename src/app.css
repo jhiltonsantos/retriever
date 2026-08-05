@@ -1,10 +1,10 @@
 @import 'tailwindcss';
 @plugin 'daisyui' {
-	themes: speechcode --default;
+	themes: retriever --default;
 }
 
 @plugin 'daisyui/theme' {
-	name: 'speechcode';
+	name: 'retriever';
 	default: true;
 	prefersdark: true;
 	color-scheme: dark;
@@ -14,8 +14,8 @@
 	--color-base-300: #2d3a4f;
 	--color-base-content: #e8edf4;
 
-	--color-primary: #3b82f6;
-	--color-primary-content: #ffffff;
+	--color-primary: #d97706;
+	--color-primary-content: #0f1419;
 
 	--color-secondary: #34d399;
 	--color-secondary-content: #0f1419;

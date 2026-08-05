@@ -1,6 +1,6 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>SpeechCode · Tutor RAG</title>
+	<title>Retriever · Tutor RAG</title>
 	<meta name="description" content="Assistente de estudos pessoal para Engenharia de Software e Inglês" />
 </svelte:head>
 
