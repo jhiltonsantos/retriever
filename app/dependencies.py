@@ -7,6 +7,7 @@ from langchain_ollama import OllamaEmbeddings
 from app.config import CHROMA_DIR, EMBED_MODEL, OLLAMA_BASE_URL, RETRIEVER_K
 from app.prompts.tutor import tutor_prompt
 from app.providers.registry import get_provider
+from app.settings_store import get_effective_config
 
 _embeddings = None
 _vectorstore = None
@@ -38,8 +39,17 @@ def get_vectorstore() -> Chroma:
 def get_llm() -> BaseChatModel:
     global _llm
     if _llm is None:
-        _llm = get_provider().build_llm()
+        cfg = get_effective_config()
+        _llm = get_provider(cfg.provider).build_llm(
+            model=cfg.model, base_url=cfg.base_url, api_key=cfg.api_key
+        )
     return _llm
+
+
+def reset_llm_cache() -> None:
+    global _llm, _retrieval_chain
+    _llm = None
+    _retrieval_chain = None
 
 
 def get_retrieval_chain():

@@ -17,6 +17,7 @@ LLM_API_BASE_URL = os.getenv("LLM_API_BASE_URL", "https://openrouter.ai/api/v1")
 
 CHROMA_DIR = Path(os.getenv("CHROMA_DIR", BASE_DIR / "chroma_data"))
 TMP_UPLOAD_DIR = Path(os.getenv("TMP_UPLOAD_DIR", BASE_DIR / "tmp_uploads"))
+SETTINGS_DIR = Path(os.getenv("SETTINGS_DIR", BASE_DIR / "user_data"))
 
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
