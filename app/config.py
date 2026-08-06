@@ -1,11 +1,19 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
+
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-LLM_MODEL = os.getenv("LLM_MODEL", "llama3")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "nomic-embed-text")
+
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openrouter")
+LLM_MODEL = os.getenv("LLM_MODEL") or None
+LLM_API_KEY = os.getenv("LLM_API_KEY", "")
+LLM_API_BASE_URL = os.getenv("LLM_API_BASE_URL", "https://openrouter.ai/api/v1")
 
 CHROMA_DIR = Path(os.getenv("CHROMA_DIR", BASE_DIR / "chroma_data"))
 TMP_UPLOAD_DIR = Path(os.getenv("TMP_UPLOAD_DIR", BASE_DIR / "tmp_uploads"))

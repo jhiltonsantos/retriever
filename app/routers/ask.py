@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Form, HTTPException
 
+from app.providers.base import ProviderConfigError, ProviderRequestError
 from app.services.rag import ask_question
 
 router = APIRouter(tags=["ask"])
@@ -9,6 +10,10 @@ router = APIRouter(tags=["ask"])
 async def ask(question: str = Form(...)):
     try:
         answer = ask_question(question)
+    except ProviderConfigError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except ProviderRequestError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
     except ConnectionError as exc:
         raise HTTPException(
             status_code=503,
