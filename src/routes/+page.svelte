@@ -22,6 +22,14 @@
 		badgeVariant="lang"
 		cta="Iniciar →"
 	/>
+	<ActionCard
+		href="/settings"
+		title="Configurações"
+		description="Escolha o provedor e o modelo de LLM usados nas respostas."
+		badge="cfg"
+		badgeVariant="code"
+		cta="Ajustar →"
+	/>
 </main>
 
 <script lang="ts">
