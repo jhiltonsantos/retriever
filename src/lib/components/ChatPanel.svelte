@@ -51,6 +51,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { askQuestion } from '$lib/api/ask';
+	import type { AskHistoryMessage } from '$lib/api/types';
 	import { clearChatSession, loadChatSession, saveChatSession } from '$lib/chat/storage';
 	import { createChatMessage, type ChatMessage as ChatMessageType } from '$lib/chat/types';
 	import ChatMessage from './ChatMessage.svelte';
@@ -92,6 +93,10 @@
 		]);
 	}
 
+	function toHistory(current: ChatMessageType[]): AskHistoryMessage[] {
+		return current.map(({ role, content }) => ({ role, content }));
+	}
+
 	async function onSubmit(event: SubmitEvent) {
 		event.preventDefault();
 		const trimmed = question.trim();
@@ -101,7 +106,7 @@
 		error = null;
 
 		try {
-			const answer = await askQuestion(trimmed);
+			const answer = await askQuestion(trimmed, toHistory(messages));
 			appendExchange(trimmed, answer);
 			question = '';
 		} catch (err) {

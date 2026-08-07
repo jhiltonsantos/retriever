@@ -1,5 +1,5 @@
 import { getApiBaseUrl } from './config';
-import type { AskResponse, FastApiError } from './types';
+import type { AskHistoryMessage, AskRequest, AskResponse, FastApiError } from './types';
 
 function parseErrorDetail(body: FastApiError): string {
 	if (typeof body.detail === 'string') {
@@ -11,12 +11,15 @@ function parseErrorDetail(body: FastApiError): string {
 	return 'Não foi possível obter uma resposta.';
 }
 
-export async function askQuestion(question: string): Promise<string> {
-	const body = new URLSearchParams({ question });
+export async function askQuestion(
+	question: string,
+	history: AskHistoryMessage[] = []
+): Promise<string> {
+	const body: AskRequest = { question, history };
 	const response = await fetch(`${getApiBaseUrl()}/ask`, {
 		method: 'POST',
-		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-		body
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(body)
 	});
 
 	if (!response.ok) {

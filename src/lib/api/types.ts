@@ -4,6 +4,18 @@ export type UploadResponse = {
 	chunks_indexed: number;
 };
 
+export type ChatHistoryRole = 'user' | 'assistant';
+
+export type AskHistoryMessage = {
+	role: ChatHistoryRole;
+	content: string;
+};
+
+export type AskRequest = {
+	question: string;
+	history?: AskHistoryMessage[];
+};
+
 export type AskResponse = {
 	answer: string;
 };
