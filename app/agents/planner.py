@@ -3,6 +3,7 @@ from pydantic import BaseModel, Field
 
 from app.dependencies import get_llm
 from app.prompts.planner import PLANNER_SYSTEM_PROMPT
+from app.services.memory import history_to_messages
 
 
 class PlannerDecision(BaseModel):
@@ -18,8 +19,10 @@ class PlannerDecision(BaseModel):
 
 
 def plan(question: str, history: list[dict]) -> PlannerDecision:
-    # `history` existe na assinatura para nao quebrar quando F-MEM comecar a
-    # popula-lo; em F-AGENT ele chega sempre vazio e nao e usado no prompt.
     llm = get_llm().with_structured_output(PlannerDecision)
-    messages = [SystemMessage(PLANNER_SYSTEM_PROMPT), HumanMessage(question)]
+    messages = [
+        SystemMessage(PLANNER_SYSTEM_PROMPT),
+        *history_to_messages(history),
+        HumanMessage(question),
+    ]
     return llm.invoke(messages)

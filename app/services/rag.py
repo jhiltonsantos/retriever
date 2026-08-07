@@ -1,14 +1,15 @@
 from app.dependencies import get_agent_graph
 from app.providers.registry import normalize_error
+from app.services.memory import normalize_history
 from app.tools.vector_search import documents_to_sources
 
 
-def ask_question(question: str) -> dict:
+def ask_question(question: str, history: list[dict] | None = None) -> dict:
     graph = get_agent_graph()
     initial_state = {
         "question": question,
         "original_question": question,
-        "history": [],
+        "history": normalize_history(history),
         "needs_retrieval": False,
         "context": [],
         "score": 0.0,

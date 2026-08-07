@@ -9,6 +9,7 @@ from app.agents.planner import plan as run_planner
 from app.config import EVALUATOR_MIN_SCORE, MAX_RETRIEVAL_LOOPS, RETRIEVER_K
 from app.dependencies import get_llm
 from app.prompts.tutor import tutor_prompt
+from app.services.memory import history_to_messages
 from app.tools.vector_search import search_documents
 
 
@@ -77,7 +78,10 @@ def generate_node(state: RagState) -> dict:
         context_text = "\n\n".join(f"[{d.metadata.get('source')}] {d.page_content}" for d in context)
     else:
         context_text = "Nenhum contexto foi recuperado; esta pergunta nao depende dos documentos do usuario."
-    messages = tutor_prompt.format_messages(context=context_text, input=state["original_question"])
+    system_message, human_message = tutor_prompt.format_messages(
+        context=context_text, input=state["original_question"]
+    )
+    messages = [system_message, *history_to_messages(state.get("history", [])), human_message]
     response = get_llm().invoke(messages)
     return {
         "answer": response.content,
