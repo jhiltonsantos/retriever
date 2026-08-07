@@ -1,7 +1,7 @@
-<section class="card bg-base-200 border border-base-300 min-h-112">
-	<div class="card-body gap-4">
+<section class="card bg-base-200 border border-base-300 h-full flex flex-col min-h-0">
+	<div class="card-body gap-4 flex-1 min-h-0 flex flex-col">
 		<div
-			class="flex-1 flex flex-col gap-3 min-h-64 max-h-112 overflow-y-auto p-1"
+			class="flex-1 min-h-0 flex flex-col gap-3 overflow-y-auto p-1"
 			bind:this={threadEl}
 		>
 			{#if messages.length === 0}
@@ -15,23 +15,7 @@
 			{/if}
 		</div>
 
-		<form class="flex flex-col gap-3" onsubmit={onSubmit}>
-			<textarea
-				class="textarea textarea-bordered w-full min-h-20 resize-y bg-base-100"
-				bind:value={question}
-				placeholder="Ex.: Quais são os padrões de projeto mais usados?"
-				rows="3"
-				disabled={submitting}
-				required
-			></textarea>
-			<button
-				type="submit"
-				class="btn btn-primary self-start"
-				disabled={submitting || !question.trim()}
-			>
-				{submitting ? 'Pensando…' : 'Enviar pergunta'}
-			</button>
-		</form>
+		<ChatComposer bind:value={question} {submitting} onSubmit={handleSubmit} />
 
 		{#if submitting}
 			<div role="status" class="alert alert-info text-sm">
@@ -51,9 +35,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { askQuestion } from '$lib/api/ask';
-	import type { AskHistoryMessage } from '$lib/api/types';
+	import type { AskHistoryMessage, AskResponse } from '$lib/api/types';
 	import { clearChatSession, loadChatSession, saveChatSession } from '$lib/chat/storage';
 	import { createChatMessage, type ChatMessage as ChatMessageType } from '$lib/chat/types';
+	import ChatComposer from './ChatComposer.svelte';
 	import ChatMessage from './ChatMessage.svelte';
 
 	let submitting = $state(false);
@@ -85,11 +70,14 @@
 		saveChatSession({ messages: next, updatedAt: new Date().toISOString() });
 	}
 
-	function appendExchange(userContent: string, assistantContent: string) {
+	function appendExchange(userContent: string, response: AskResponse) {
 		persistMessages([
 			...messages,
 			createChatMessage('user', userContent),
-			createChatMessage('assistant', assistantContent)
+			createChatMessage('assistant', response.answer, {
+				sources: response.sources,
+				agentSteps: response.agent_steps
+			})
 		]);
 	}
 
@@ -97,8 +85,7 @@
 		return current.map(({ role, content }) => ({ role, content }));
 	}
 
-	async function onSubmit(event: SubmitEvent) {
-		event.preventDefault();
+	async function handleSubmit() {
 		const trimmed = question.trim();
 		if (!trimmed || submitting) return;
 
@@ -106,8 +93,8 @@
 		error = null;
 
 		try {
-			const answer = await askQuestion(trimmed, toHistory(messages));
-			appendExchange(trimmed, answer);
+			const response = await askQuestion(trimmed, toHistory(messages));
+			appendExchange(trimmed, response);
 			question = '';
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Não foi possível obter uma resposta.';

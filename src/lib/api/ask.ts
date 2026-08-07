@@ -14,7 +14,7 @@ function parseErrorDetail(body: FastApiError): string {
 export async function askQuestion(
 	question: string,
 	history: AskHistoryMessage[] = []
-): Promise<string> {
+): Promise<AskResponse> {
 	const body: AskRequest = { question, history };
 	const response = await fetch(`${getApiBaseUrl()}/ask`, {
 		method: 'POST',
@@ -34,5 +34,5 @@ export async function askQuestion(
 	}
 
 	const data = (await response.json()) as AskResponse;
-	return data.answer;
+	return data;
 }

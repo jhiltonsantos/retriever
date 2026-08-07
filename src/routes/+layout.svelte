@@ -4,7 +4,7 @@
 	<meta name="description" content="Assistente de estudos pessoal para Engenharia de Software e Inglês" />
 </svelte:head>
 
-<div class="min-h-screen max-w-[1100px] mx-auto p-6">
+<div class="h-screen overflow-y-auto max-w-[1100px] mx-auto p-6 flex flex-col">
 	<OllamaStatus />
 	{@render children()}
 </div>

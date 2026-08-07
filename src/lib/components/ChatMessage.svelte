@@ -13,10 +13,22 @@
 	>
 		{message.content}
 	</div>
+	{#if message.sources?.length || message.agentSteps?.length}
+		<div class="chat-footer flex flex-col gap-2 mt-1 w-full max-w-md">
+			{#if message.sources?.length}
+				<ChatSources sources={message.sources} />
+			{/if}
+			{#if message.agentSteps?.length}
+				<AgentSteps steps={message.agentSteps} />
+			{/if}
+		</div>
+	{/if}
 </div>
 
 <script lang="ts">
 	import type { ChatMessage as ChatMessageType } from '$lib/chat/types';
+	import AgentSteps from './AgentSteps.svelte';
+	import ChatSources from './ChatSources.svelte';
 
 	type Props = {
 		message: ChatMessageType;

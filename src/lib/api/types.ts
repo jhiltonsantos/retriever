@@ -16,8 +16,23 @@ export type AskRequest = {
 	history?: AskHistoryMessage[];
 };
 
+export type AskSource = {
+	source: string;
+	type: 'pdf' | 'text';
+	page: number | null;
+	snippet: string;
+};
+
+export type AskAgentStep = {
+	step: string;
+	loop: number;
+	detail: string;
+};
+
 export type AskResponse = {
 	answer: string;
+	sources?: AskSource[];
+	agent_steps?: AskAgentStep[];
 };
 
 export type IngestTextResponse = {
