@@ -7,9 +7,9 @@
 
 <main class="grid grid-cols-1 md:grid-cols-2 gap-5">
 	<ActionCard
-		href="/upload"
-		title="Enviar PDF"
-		description="Indexe materiais de programação e inglês no ChromaDB para consultas futuras."
+		href="/ingest"
+		title="Indexar materiais"
+		description="Envie um PDF ou cole um texto direto na interface para consultas futuras."
 		badge={'{ }'}
 		badgeVariant="code"
 		cta="Abrir →"
