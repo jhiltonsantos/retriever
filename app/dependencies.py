@@ -5,12 +5,11 @@ from langchain_ollama import OllamaEmbeddings
 from app.config import CHROMA_DIR, EMBED_MODEL, OLLAMA_BASE_URL
 from app.providers.registry import get_provider
 from app.settings_store import get_effective_config
-from app.tools import TOOLS
 
 _embeddings = None
 _vectorstore = None
 _llm = None
-_agent_llm = None
+_agent_graph = None
 
 
 def get_embeddings() -> OllamaEmbeddings:
@@ -44,14 +43,15 @@ def get_llm() -> BaseChatModel:
     return _llm
 
 
-def get_agent_llm() -> BaseChatModel:
-    global _agent_llm
-    if _agent_llm is None:
-        _agent_llm = get_llm().bind_tools(TOOLS)
-    return _agent_llm
+def get_agent_graph():
+    global _agent_graph
+    if _agent_graph is None:
+        from app.graph.rag_agent import build_graph
+
+        _agent_graph = build_graph().compile()
+    return _agent_graph
 
 
 def reset_llm_cache() -> None:
-    global _llm, _agent_llm
+    global _llm
     _llm = None
-    _agent_llm = None

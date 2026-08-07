@@ -1,37 +1,28 @@
-from langchain_core.messages import HumanMessage, SystemMessage
-
-from app.dependencies import get_agent_llm
-from app.prompts.agent import AGENT_SYSTEM_PROMPT
+from app.dependencies import get_agent_graph
 from app.providers.registry import normalize_error
-from app.tools import TOOLS
-
-MAX_TOOL_ROUNDS = 3
-_TOOLS_BY_NAME = {t.name: t for t in TOOLS}
+from app.tools.vector_search import documents_to_sources
 
 
 def ask_question(question: str) -> dict:
-    llm = get_agent_llm()
-    messages = [SystemMessage(AGENT_SYSTEM_PROMPT), HumanMessage(question)]
-    sources: list[dict] = []
-
+    graph = get_agent_graph()
+    initial_state = {
+        "question": question,
+        "original_question": question,
+        "history": [],
+        "needs_retrieval": False,
+        "context": [],
+        "score": 0.0,
+        "loops": 0,
+        "steps": [],
+        "answer": "",
+    }
     try:
-        for _ in range(MAX_TOOL_ROUNDS):
-            response = llm.invoke(messages)
-            if not response.tool_calls:
-                return _build_result(response.content, sources)
-
-            messages.append(response)
-            for call in response.tool_calls:
-                tool_message = _TOOLS_BY_NAME[call["name"]].invoke(call)
-                messages.append(tool_message)
-                if tool_message.artifact:
-                    sources.extend(tool_message.artifact)
-
-        response = llm.invoke(messages)
-        return _build_result(response.content, sources)
+        final_state = graph.invoke(initial_state)
     except Exception as exc:
         raise normalize_error(exc) from exc
 
-
-def _build_result(answer: str, sources: list[dict]) -> dict:
-    return {"answer": answer, "sources": sources}
+    return {
+        "answer": final_state["answer"],
+        "sources": documents_to_sources(final_state.get("context") or []),
+        "agent_steps": final_state["steps"],
+    }

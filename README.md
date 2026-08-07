@@ -1,13 +1,11 @@
 # Retriever API
 
-Backend FastAPI do assistente de estudos **Retriever** — RAG para Programação e Inglês, com banco vetorial local.
-
-Este submodule faz parte do monorepo [retriever](https://github.com/jhiltonsantos/retriever), onde vive a documentação completa.
+Backend FastAPI do assistente de estudos **Retriever**, com banco vetorial local e ferramentas para o embedding.
 
 ## Pré-requisitos
 
 - Python 3.11 ou superior
-- [Ollama](https://ollama.com/download) rodando — obrigatório, os embeddings são sempre locais
+- [Ollama](https://ollama.com/download) rodando os embeddings locais
 - Modelo de embeddings baixado
 
 ```shell

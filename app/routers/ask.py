@@ -28,4 +28,6 @@ async def ask(question: str = Form(...)):
     response = {"answer": result["answer"]}
     if result["sources"]:
         response["sources"] = result["sources"]
+    if result["agent_steps"]:
+        response["agent_steps"] = result["agent_steps"]
     return response

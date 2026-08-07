@@ -9,5 +9,6 @@ langchain-ollama
 langchain-openai
 langchain-chroma
 langchain-text-splitters
+langgraph
 chromadb
 pypdf
