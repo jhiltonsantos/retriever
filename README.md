@@ -14,7 +14,9 @@ Este submodule faz parte do monorepo [retriever](https://github.com/jhiltonsanto
 ollama pull nomic-embed-text
 ```
 
-O `llama3` só é necessário para quem for usar o LLM local em vez de uma API remota.
+O LLM local (`ollama pull llama3.1`) só é necessário para quem for usar o Ollama em vez de uma API remota.
+
+**Importante — tool calling.** O `/ask` invoca o LLM com ferramentas vinculadas (`vector_search`, `list_documents`, `summarize_chunks`), então o modelo escolhido precisa suportar tool calling. `llama3` (sem o `.1`) **não suporta** e é rejeitado pelo Ollama; use `llama3.1` ou outro modelo com suporte (`qwen2.5`, `mistral-nemo`, `llama3-groq-tool-use`). Via OpenRouter, o padrão é `deepseek/deepseek-v4-flash-0731`. Detalhes e mais exemplos em `docs/providers.md` no monorepo.
 
 ## Como rodar
 
@@ -67,8 +69,15 @@ retriever-api/
 
 ```json
 {
-  "answer": "Resposta contextual gerada pelo tutor..."
+  "answer": "Resposta contextual gerada pelo tutor...",
+  "sources": [
+    { "source": "guia-python.pdf", "type": "pdf", "page": 3, "snippet": "..." }
+  ]
 }
 ```
+
+`sources` só aparece quando o LLM chamou `vector_search` pra responder — perguntas que não dependem de documento não trazem esse campo.
+
+Lista completa de endpoints (`/settings/llm`, `/ingest/text`, `/documents`, etc.) e o contrato completo em `docs/api-contract.md` no monorepo.
 
 O contrato completo, incluindo a evolução planejada, está em `docs/api-contract.md` no monorepo.

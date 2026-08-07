@@ -9,7 +9,7 @@ router = APIRouter(tags=["ask"])
 @router.post("/ask")
 async def ask(question: str = Form(...)):
     try:
-        answer = ask_question(question)
+        result = ask_question(question)
     except ProviderConfigError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except ProviderRequestError as exc:
@@ -25,4 +25,7 @@ async def ask(question: str = Form(...)):
             detail="Não foi possível conectar aos modelos em localhost:11434.",
         ) from exc
 
-    return {"answer": answer}
+    response = {"answer": result["answer"]}
+    if result["sources"]:
+        response["sources"] = result["sources"]
+    return response

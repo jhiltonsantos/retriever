@@ -3,7 +3,7 @@ from langchain_ollama import ChatOllama
 
 from app.providers.base import ModelInfo, TestResult
 
-DEFAULT_MODEL = "llama3"
+DEFAULT_MODEL = "llama3.1"  # llama3 nao suporta tool calling no Ollama, ver docs/providers.md
 
 
 class OllamaProvider:
@@ -52,4 +52,6 @@ class OllamaProvider:
         return {"ok": True, "reason": None, "message": "Conexao com o Ollama ok."}
 
     def normalize_error(self, exc: Exception) -> Exception:
+        if isinstance(exc, httpx.RequestError):
+            return ConnectionError("Nao foi possivel conectar ao Ollama.")
         return exc

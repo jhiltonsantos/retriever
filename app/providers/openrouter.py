@@ -8,7 +8,7 @@ from app.providers.base import (
     TestResult,
 )
 
-DEFAULT_MODEL = "meta-llama/llama-3.3-70b-instruct"
+DEFAULT_MODEL = "deepseek/deepseek-v4-flash-0731"  # barato e com tool calling confiavel, ver docs/providers.md
 
 HEADERS = {
     "HTTP-Referer": "https://github.com/jhiltonsantos/retriever",

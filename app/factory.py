@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import CORS_ORIGINS
-from app.routers import ask, health, settings, upload
+from app.routers import ask, health, ingest, settings, upload
 
 
 def create_app() -> FastAPI:
@@ -24,5 +24,6 @@ def create_app() -> FastAPI:
     app.include_router(upload.router)
     app.include_router(ask.router)
     app.include_router(settings.router)
+    app.include_router(ingest.router)
 
     return app
