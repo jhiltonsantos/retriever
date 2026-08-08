@@ -6,7 +6,17 @@
 			<Cpu size={20} />
 		</span>
 		<div>
-			<h2 class="m-0 text-lg font-semibold text-[var(--color-on-surface)]">Provedor de LLM</h2>
+			<div class="flex items-center gap-2">
+				<h2 class="m-0 text-lg font-semibold text-[var(--color-on-surface)]">Provedor de LLM</h2>
+				<button
+					type="button"
+					class="btn btn-ghost btn-circle btn-xs"
+					onclick={onInfoClick}
+					aria-label="O que é isso?"
+				>
+					<Info size={18} />
+				</button>
+			</div>
 			<p class="mt-1 text-sm text-[var(--color-outline)]">Escolha onde as respostas são geradas</p>
 		</div>
 	</header>
@@ -18,7 +28,7 @@
 		</div>
 	{:else}
 		<form class="flex flex-col gap-4" onsubmit={onSave}>
-			<div class="flex gap-6">
+			<div class=" pt-2">
 				<label class="label cursor-pointer gap-2">
 					<input
 						type="radio"
@@ -142,9 +152,21 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Cpu } from '@lucide/svelte';
+	import { Cpu, Info } from '@lucide/svelte';
 	import { getLlmModels, getLlmSettings, testLlmConnection, updateLlmSettings } from '$lib/api/settings';
 	import type { LlmModel, LlmProviderId, LlmSettings, TestConnectionResult } from '$lib/settings/types';
+	import { showAlert } from '$lib/alerts.svelte';
+
+	const LLM_PROVIDER_EXPLANATION =
+		'O "provedor" e o servico que gera as respostas do tutor.\n\n' +
+		'- Ollama local: roda no seu computador, sem custo por uso e sem enviar dados pra fora, mas depende do hardware local.\n\n' +
+		'- OpenRouter: usa modelos na nuvem (mais rapidos), exige chave de API e conexao com a internet.\n\n' +
+		'- Custom: qualquer servidor compativel com a API da OpenAI (LM Studio, vLLM, etc).\n\n' +
+		'O "modelo" e qual IA especifica dentro do provedor escolhido; "Base URL" e "Chave de API" sao os dados de conexao do provedor remoto.';
+
+	async function onInfoClick() {
+		await showAlert(LLM_PROVIDER_EXPLANATION, { title: 'Provedor de LLM' });
+	}
 
 	let loading = $state(true);
 	let settings = $state<LlmSettings | null>(null);

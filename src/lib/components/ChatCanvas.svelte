@@ -24,6 +24,7 @@
 	import TopBar from './TopBar.svelte';
 	import OllamaStatus from './OllamaStatus.svelte';
 	import ChatPanel from './ChatPanel.svelte';
+	import { loadConversations } from '$lib/chat/conversations.svelte';
 
 	let chatPanel = $state<ChatPanel | undefined>(undefined);
 	const initialQuestion = $derived(page.url.searchParams.get('q') ?? undefined);
@@ -33,5 +34,6 @@
 		const url = new URL(page.url);
 		url.searchParams.set('conv', id);
 		goto(url.toString(), { replaceState: true });
+		loadConversations();
 	}
 </script>

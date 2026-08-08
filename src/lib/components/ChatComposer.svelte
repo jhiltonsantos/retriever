@@ -6,13 +6,14 @@
 			class="flex w-full items-center gap-2 rounded-full border border-[var(--color-outline-variant)]/40 bg-[var(--color-surface-container-lowest)]/80 p-2 shadow-[0_12px_32px_rgba(0,0,0,0.12)] backdrop-blur-md"
 			onsubmit={handleSubmit}
 		>
-			<a
-				href="/ingest"
-				class="btn btn-circle btn-ghost size-12 shrink-0"
-				aria-label="Indexar materiais"
+			<button
+				type="button"
+				class="btn btn-circle btn-ghost size-12 shrink-0 cursor-not-allowed opacity-40"
+				disabled
+				aria-label="Anexar arquivo (em breve)"
 			>
 				<Paperclip size={18} />
-			</a>
+			</button>
 			<textarea
 				class="max-h-32 min-h-0 flex-1 resize-none border-none bg-transparent px-4 py-3 text-sm text-[var(--color-on-surface)] placeholder:text-[var(--color-outline)] focus:outline-none"
 				bind:value
@@ -24,7 +25,9 @@
 			></textarea>
 			<button
 				type="submit"
-				class="btn btn-circle size-12 shrink-0 border-none bg-[var(--color-primary)] text-[var(--color-primary-content)]"
+				class="btn btn-circle size-12 shrink-0 border-none {value.trim()
+					? 'bg-[var(--color-primary)] text-[var(--color-primary-content)]'
+					: 'bg-[var(--color-surface-container-high)] text-[var(--color-outline)]'}"
 				disabled={submitting || !value.trim()}
 				aria-label="Enviar"
 			>

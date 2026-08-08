@@ -9,20 +9,22 @@
 		role="dialog"
 		aria-modal="true"
 		tabindex="-1"
-		class="relative z-10 max-h-[85vh] w-full overflow-y-auto rounded-[3rem] border border-[var(--color-outline-variant)]/40 bg-[var(--color-surface-container-low)] p-10 shadow-[0px_20px_60px_rgba(0,0,0,0.15)] {size ===
+		class="relative z-10 h-[85vh] w-full overflow-hidden rounded-[3rem] border border-[var(--color-outline-variant)]/40 bg-[var(--color-surface-container-low)] shadow-[0px_20px_60px_rgba(0,0,0,0.15)] {size ===
 		'lg'
 			? 'max-w-4xl'
 			: 'max-w-2xl'}"
 	>
 		<button
 			type="button"
-			class="btn btn-ghost btn-circle absolute top-6 right-6"
+			class="btn btn-ghost btn-circle absolute top-6 right-6 z-20"
 			onclick={onClose}
 			aria-label="Fechar"
 		>
 			<X size={20} />
 		</button>
-		{@render children()}
+		<div class="h-full overflow-y-auto p-10">
+			{@render children()}
+		</div>
 	</div>
 </div>
 

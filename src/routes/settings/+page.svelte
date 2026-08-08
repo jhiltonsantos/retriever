@@ -1,25 +1,30 @@
-<div class="flex flex-col gap-6">
-	<div class="flex gap-2">
+<div class="flex flex-row gap-8 pt-6">
+	<nav class="flex w-40 shrink-0 flex-col gap-2">
 		{#each tabs as tab (tab.id)}
 			<button
 				type="button"
-				class="btn btn-sm rounded-full {activeTab === tab.id ? 'btn-primary' : 'btn-ghost'}"
+				class="flex h-11 items-center rounded-r-full border-l-4 pl-5 pr-4 text-left text-sm font-semibold {activeTab ===
+				tab.id
+					? 'border-l-[var(--color-primary)] bg-[var(--color-primary-container)]/10 text-[var(--color-primary)]'
+					: 'border-l-transparent text-[var(--color-on-surface-variant)] hover:bg-[var(--color-surface-container)]'}"
 				onclick={() => (activeTab = tab.id)}
 			>
 				{tab.label}
 			</button>
 		{/each}
-	</div>
+	</nav>
 
-	{#if activeTab === 'providers'}
-		<LlmSettingsCard />
-		<div class="h-px bg-[var(--color-outline-variant)]/30"></div>
-		<EmbeddingsInfoPanel />
-	{:else if activeTab === 'profile'}
-		<ProfileCard />
-	{:else if activeTab === 'about'}
-		<AboutCard />
-	{/if}
+	<div class="flex min-w-0 flex-1 flex-col gap-8">
+		{#if activeTab === 'providers'}
+			<LlmSettingsCard />
+			<div class="h-px bg-[var(--color-outline-variant)]/30"></div>
+			<EmbeddingsInfoPanel />
+		{:else if activeTab === 'profile'}
+			<ProfileCard />
+		{:else if activeTab === 'about'}
+			<AboutCard />
+		{/if}
+	</div>
 </div>
 
 <script lang="ts">

@@ -11,7 +11,7 @@
 			<h1
 				class="m-0 font-['Comfortaa'] text-5xl leading-[56px] font-bold tracking-[-0.02em] text-[var(--color-on-surface)]"
 			>
-				{greeting}
+				{#if displayName}{greeting}, {displayName}!{:else}{greeting}!{/if}
 			</h1>
 			<p class="m-0 text-lg text-[var(--color-outline)]">Como posso ajudar com seus materiais hoje?</p>
 		</div>
@@ -42,6 +42,7 @@
 </div>
 
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { Database, Folder, History } from '@lucide/svelte';
 	import favicon from '$lib/assets/favicon.svg';
@@ -49,14 +50,25 @@
 	import OllamaStatus from './OllamaStatus.svelte';
 	import ActionCard from './ActionCard.svelte';
 	import ChatComposer from './ChatComposer.svelte';
+	import { getProfile } from '$lib/api/profile';
 
 	let draft = $state('');
+	let displayName = $state<string | null>(null);
+
+	onMount(async () => {
+		try {
+			const profile = await getProfile();
+			displayName = profile.display_name;
+		} catch {
+			displayName = null;
+		}
+	});
 
 	const greeting = (() => {
 		const hour = new Date().getHours();
-		if (hour < 12) return 'Bom dia!';
-		if (hour < 18) return 'Boa tarde!';
-		return 'Boa noite!';
+		if (hour < 12) return 'Bom dia';
+		if (hour < 18) return 'Boa tarde';
+		return 'Boa noite';
 	})();
 
 	function startChatFromHome() {
