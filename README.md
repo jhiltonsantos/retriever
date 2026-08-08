@@ -365,4 +365,4 @@ curl -X POST http://127.0.0.1:8000/ask \
 
 ## License
 
-To be defined.
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
