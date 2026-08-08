@@ -69,6 +69,7 @@
 	import { Home, Database, Folder, History, Settings, CircleHelp, Plus } from '@lucide/svelte';
 	import favicon from '$lib/assets/favicon.svg';
 	import { listRecentConversations, startNewConversation } from '$lib/chat/conversations';
+	import { showConfirm } from '$lib/alerts.svelte';
 
 	const mainItems = [
 		{ href: '/', label: 'Início', icon: Home },
@@ -88,10 +89,13 @@
 		return href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
 	}
 
-	function onNewChat() {
+	async function onNewChat() {
 		if (
 			recentConversations.length > 0 &&
-			!confirm('Iniciar uma nova conversa? A conversa atual será apagada.')
+			!(await showConfirm('Iniciar uma nova conversa? A conversa atual será apagada.', {
+				confirmLabel: 'Iniciar nova conversa',
+				variant: 'error'
+			}))
 		) {
 			return;
 		}

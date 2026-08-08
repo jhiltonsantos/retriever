@@ -1,11 +1,15 @@
-export type LlmProviderId = 'ollama' | 'openrouter';
+export type LlmProviderId = 'ollama' | 'openrouter' | 'custom';
 
-export type LlmSettings = {
-	provider: LlmProviderId;
+export type ProviderConfig = {
 	model: string | null;
 	base_url: string;
 	api_key_masked: string | null;
 	api_key_set: boolean;
+};
+
+export type LlmSettings = {
+	active_provider: LlmProviderId;
+	providers: Record<LlmProviderId, ProviderConfig>;
 };
 
 export type LlmModel = {

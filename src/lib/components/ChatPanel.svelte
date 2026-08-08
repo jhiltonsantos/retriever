@@ -36,6 +36,7 @@
 	import type { AskHistoryMessage, AskResponse } from '$lib/api/types';
 	import { clearChatSession, loadChatSession, saveChatSession } from '$lib/chat/storage';
 	import { createChatMessage, type ChatMessage as ChatMessageType } from '$lib/chat/types';
+	import { showConfirm } from '$lib/alerts.svelte';
 	import ChatComposer from './ChatComposer.svelte';
 	import ChatMessage from './ChatMessage.svelte';
 
@@ -65,8 +66,13 @@
 		threadEl.scrollTop = threadEl.scrollHeight;
 	});
 
-	export function clearHistory() {
-		if (!confirm('Limpar todo o histórico desta conversa?')) {
+	export async function clearHistory() {
+		if (
+			!(await showConfirm('Limpar todo o histórico desta conversa?', {
+				confirmLabel: 'Limpar histórico',
+				variant: 'error'
+			}))
+		) {
 			return;
 		}
 		messages = [];
