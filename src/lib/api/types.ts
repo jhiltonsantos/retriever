@@ -14,6 +14,7 @@ export type AskHistoryMessage = {
 export type AskRequest = {
 	question: string;
 	history?: AskHistoryMessage[];
+	conversation_id?: string;
 };
 
 export type AskSource = {
@@ -55,4 +56,56 @@ export type DocumentsResponse = {
 
 export type FastApiError = {
 	detail: string | { msg: string }[];
+};
+
+// --- Stage 2: Conversations ---
+export type ConversationSummary = {
+	id: string;
+	title: string;
+	created_at: string;
+	updated_at: string;
+	message_count: number;
+};
+
+export type ConversationsListResponse = {
+	conversations: ConversationSummary[];
+};
+
+export type StoredMessage = {
+	id: string;
+	role: 'user' | 'assistant';
+	content: string;
+	sources?: AskSource[];
+	agent_steps?: AskAgentStep[];
+	created_at: string;
+};
+
+export type ConversationDetail = {
+	id: string;
+	title: string;
+	created_at: string;
+	updated_at: string;
+	messages: StoredMessage[];
+};
+
+// --- Stage 2: Materials catalog ---
+export type MaterialInfo = {
+	id: string;
+	source: string;
+	type: 'pdf' | 'text';
+	title: string | null;
+	chunk_count: number;
+	ingested_at: string;
+};
+
+export type MaterialsListResponse = {
+	materials: MaterialInfo[];
+};
+
+// --- Stage 2: Profile ---
+export type UserProfile = {
+	id: number;
+	display_name: string | null;
+	created_at: string;
+	updated_at: string;
 };

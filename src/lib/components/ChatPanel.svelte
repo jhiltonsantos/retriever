@@ -33,8 +33,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { askQuestion } from '$lib/api/ask';
-	import type { AskHistoryMessage, AskResponse } from '$lib/api/types';
-	import { clearChatSession, loadChatSession, saveChatSession } from '$lib/chat/storage';
+	import {
+		addMessage,
+		createConversation,
+		deleteConversation,
+		getConversation
+	} from '$lib/api/conversations';
+	import type { AskHistoryMessage, AskResponse, StoredMessage } from '$lib/api/types';
 	import { createChatMessage, type ChatMessage as ChatMessageType } from '$lib/chat/types';
 	import { showConfirm } from '$lib/alerts.svelte';
 	import ChatComposer from './ChatComposer.svelte';
@@ -42,19 +47,43 @@
 
 	type Props = {
 		initialQuestion?: string;
+		conversationId?: string;
+		onConversationCreated?: (id: string) => void;
 	};
 
-	let { initialQuestion }: Props = $props();
+	let { initialQuestion, conversationId = $bindable(), onConversationCreated }: Props = $props();
 
 	let submitting = $state(false);
 	let question = $state('');
 	let error = $state<string | null>(null);
 	let messages = $state<ChatMessageType[]>([]);
 	let threadEl = $state<HTMLElement | null>(null);
+	let loadingConversation = $state(false);
+
+	function fromStoredMessage(stored: StoredMessage): ChatMessageType {
+		return {
+			id: stored.id,
+			role: stored.role,
+			content: stored.content,
+			createdAt: stored.created_at,
+			sources: stored.sources,
+			agentSteps: stored.agent_steps
+		};
+	}
+
+	async function loadConversation(id: string) {
+		loadingConversation = true;
+		try {
+			const detail = await getConversation(id);
+			messages = detail.messages.map(fromStoredMessage);
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Erro ao carregar conversa.';
+		} finally {
+			loadingConversation = false;
+		}
+	}
 
 	onMount(() => {
-		messages = loadChatSession().messages;
-
 		if (initialQuestion && messages.length === 0) {
 			question = initialQuestion;
 			handleSubmit();
@@ -66,6 +95,15 @@
 		threadEl.scrollTop = threadEl.scrollHeight;
 	});
 
+	$effect(() => {
+		if (conversationId) {
+			loadConversation(conversationId);
+		} else {
+			messages = [];
+			error = null;
+		}
+	});
+
 	export async function clearHistory() {
 		if (
 			!(await showConfirm('Limpar todo o histórico desta conversa?', {
@@ -75,42 +113,75 @@
 		) {
 			return;
 		}
+
+		if (conversationId) {
+			try {
+				await deleteConversation(conversationId);
+			} catch (err) {
+				error = err instanceof Error ? err.message : 'Erro ao excluir conversa.';
+				return;
+			}
+		}
+
 		messages = [];
 		error = null;
-		clearChatSession();
-	}
-
-	function persistMessages(next: ChatMessageType[]) {
-		messages = next;
-		saveChatSession({ messages: next, updatedAt: new Date().toISOString() });
-	}
-
-	function appendExchange(userContent: string, response: AskResponse) {
-		persistMessages([
-			...messages,
-			createChatMessage('user', userContent),
-			createChatMessage('assistant', response.answer, {
-				sources: response.sources,
-				agentSteps: response.agent_steps
-			})
-		]);
+		conversationId = undefined;
 	}
 
 	function toHistory(current: ChatMessageType[]): AskHistoryMessage[] {
 		return current.map(({ role, content }) => ({ role, content }));
 	}
 
+	async function ensureConversation(userContent: string): Promise<string> {
+		if (conversationId) return conversationId;
+
+		const title = userContent.slice(0, 48);
+		try {
+			const created = await createConversation(title);
+			conversationId = created.id;
+			onConversationCreated?.(created.id);
+			return created.id;
+		} catch (err) {
+			throw err instanceof Error ? err : new Error('Erro ao criar conversa.');
+		}
+	}
+
+	async function persistUserMessage(id: string, content: string): Promise<ChatMessageType> {
+		const stored = await addMessage(id, 'user', content);
+		return fromStoredMessage(stored);
+	}
+
+	async function persistAssistantMessage(
+		id: string,
+		response: AskResponse
+	): Promise<ChatMessageType> {
+		const stored = await addMessage(
+			id,
+			'assistant',
+			response.answer,
+			response.sources,
+			response.agent_steps
+		);
+		return fromStoredMessage(stored);
+	}
+
 	async function handleSubmit() {
 		const trimmed = question.trim();
-		if (!trimmed || submitting) return;
+		if (!trimmed || submitting || loadingConversation) return;
 
 		submitting = true;
 		error = null;
 
 		try {
-			const response = await askQuestion(trimmed, toHistory(messages));
-			appendExchange(trimmed, response);
+			const id = await ensureConversation(trimmed);
+
+			const userMessage = await persistUserMessage(id, trimmed);
+			messages = [...messages, userMessage];
 			question = '';
+
+			const response = await askQuestion(trimmed, toHistory(messages), id);
+			const assistantMessage = await persistAssistantMessage(id, response);
+			messages = [...messages, assistantMessage];
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Não foi possível obter uma resposta.';
 		} finally {

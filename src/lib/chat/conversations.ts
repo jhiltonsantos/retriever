@@ -1,35 +1,34 @@
-import { loadChatSession, clearChatSession } from './storage';
+import type { ConversationSummary } from '$lib/api/types';
+import { listConversations as apiListConversations } from '$lib/api/conversations';
 
-export type ConversationSummary = {
-	id: string;
-	title: string;
-	updatedAt: string;
-	messageCount: number;
-};
+export type { ConversationSummary };
 
-/**
- * Etapa 1 do F-REDESIGN: adaptador sobre a sessao unica em localStorage.
- * Na Etapa 2 isso chama a API real (multi-conversa em SQLite) sem que
- * SideNav/`/history` precisem mudar.
- */
-export function listRecentConversations(): ConversationSummary[] {
-	const session = loadChatSession();
-	if (session.messages.length === 0) {
-		return [];
+// Reactive store — components import this and get live data
+let conversationsCache = $state<ConversationSummary[]>([]);
+let loaded = $state(false);
+
+export async function loadConversations(): Promise<ConversationSummary[]> {
+	try {
+		conversationsCache = await apiListConversations();
+		loaded = true;
+	} catch {
+		conversationsCache = [];
 	}
-
-	const firstUserMessage = session.messages.find((message) => message.role === 'user');
-
-	return [
-		{
-			id: 'current',
-			title: firstUserMessage ? firstUserMessage.content.slice(0, 48) : 'Nova conversa',
-			updatedAt: session.updatedAt,
-			messageCount: session.messages.length
-		}
-	];
+	return conversationsCache;
 }
 
-export function startNewConversation(): void {
-	clearChatSession();
+export function listRecentConversations(): ConversationSummary[] {
+	return conversationsCache.slice(0, 5);
+}
+
+export function getAllConversations(): ConversationSummary[] {
+	return conversationsCache;
+}
+
+export function invalidateConversations(): void {
+	loaded = false;
+}
+
+export function isLoaded(): boolean {
+	return loaded;
 }
