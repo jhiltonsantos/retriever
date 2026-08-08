@@ -15,7 +15,7 @@
 			{#if request.title}
 				<h3 class="m-0 mb-2 text-base font-semibold text-[var(--color-on-surface)]">{request.title}</h3>
 			{/if}
-			<p class="m-0 text-sm text-[var(--color-on-surface-variant)]">{request.message}</p>
+			<p class="m-0 text-sm whitespace-pre-line text-[var(--color-on-surface-variant)]">{request.message}</p>
 			<div class="mt-5 flex justify-end gap-3">
 				{#if request.kind === 'confirm'}
 					<button type="button" class="btn btn-ghost rounded-full" onclick={() => resolveCurrent(false)}>

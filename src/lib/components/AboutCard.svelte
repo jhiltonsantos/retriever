@@ -15,7 +15,7 @@
 		<dt class="text-[var(--color-outline)]">Versão</dt>
 		<dd>0.0.1</dd>
 		<dt class="text-[var(--color-outline)]">Descrição</dt>
-		<dd>Assistente de estudos pessoal para Engenharia de Software e Inglês</dd>
+		<dd>Assistente de estudos e documentação pessoal</dd>
 	</dl>
 
 	<div class="flex flex-col gap-2 text-sm text-[var(--color-outline)]">
@@ -26,13 +26,14 @@
 		<p>
 			Documentação completa está disponível no repositório:
 			<a
-				href="https://github.com/hiltonmbr/retriever"
+				href="https://github.com/jhiltonsantos/retriever"
 				target="_blank"
 				rel="noopener noreferrer"
 				class="text-[var(--color-primary)] underline"
 			>
-				github.com/hiltonmbr/retriever
+				github.com/jhiltonsantos/retriever
 			</a>
+			.
 		</p>
 	</div>
 </section>

@@ -15,7 +15,11 @@
 			{/if}
 			<RouteModal
 				onClose={() => goto(getBackgroundPath())}
-				size={page.url.pathname.startsWith('/history') ? 'lg' : 'md'}
+				size={page.url.pathname.startsWith('/history') ||
+				page.url.pathname.startsWith('/settings') ||
+				page.url.pathname.startsWith('/library')
+					? 'lg'
+					: 'md'}
 			>
 				{@render children()}
 			</RouteModal>
