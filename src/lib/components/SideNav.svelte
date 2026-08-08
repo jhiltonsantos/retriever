@@ -1,10 +1,10 @@
 <aside
 	class="m-5 flex h-[calc(100vh-2.5rem)] w-[265px] shrink-0 flex-col gap-8 overflow-y-auto rounded-[1.25rem] border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-low)] p-4"
 >
-	<div class="flex h-14 items-center gap-2">
+	<a href="/" class="flex h-14 items-center gap-2 no-underline">
 		<img src={favicon} alt="" class="size-10" />
 		<span class="font-['Comfortaa'] text-2xl font-bold text-[var(--color-primary)]">Retriever</span>
-	</div>
+	</a>
 
 	<button
 		type="button"

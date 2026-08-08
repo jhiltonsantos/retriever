@@ -28,12 +28,12 @@
 		</div>
 	{:else}
 		<form class="flex flex-col gap-4" onsubmit={onSave}>
-			<div class=" pt-2">
+			<div class=" pt-2 flex flex-row gap-x-6">
 				<label class="label cursor-pointer gap-2">
 					<input
 						type="radio"
 						name="provider"
-						class="radio radio-primary"
+						class="radio radio-primary border-secondary border"
 						value="ollama"
 						checked={provider === 'ollama'}
 						onchange={() => onProviderChange('ollama')}
@@ -44,7 +44,7 @@
 					<input
 						type="radio"
 						name="provider"
-						class="radio radio-primary"
+						class="radio radio-primary border-secondary border"
 						value="openrouter"
 						checked={provider === 'openrouter'}
 						onchange={() => onProviderChange('openrouter')}
@@ -55,7 +55,7 @@
 					<input
 						type="radio"
 						name="provider"
-						class="radio radio-primary"
+						class="radio radio-primary border-secondary border"
 						value="custom"
 						checked={provider === 'custom'}
 						onchange={() => onProviderChange('custom')}

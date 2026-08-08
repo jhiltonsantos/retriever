@@ -6,17 +6,17 @@
 			</h2>
 			<p class="m-0 text-sm text-[var(--color-outline)]">PDFs e textos disponíveis para consulta pelo tutor.</p>
 		</div>
-		<div class="join shrink-0">
+		<div class="join shrink-0 gap-1 pr-10 pt-1">
 			<button
 				type="button"
-				class="btn btn-sm join-item {view === 'list' ? 'btn-primary' : 'btn-ghost'}"
+				class="btn btn-sm join-item {view === 'list' ? 'btn-primary' : 'btn-soft'}"
 				onclick={() => (view = 'list')}
 			>
 				Lista
 			</button>
 			<button
 				type="button"
-				class="btn btn-sm join-item {view === 'graph' ? 'btn-primary' : 'btn-ghost'}"
+				class="btn btn-sm join-item {view === 'graph' ? 'btn-primary' : 'btn-soft'}"
 				onclick={() => (view = 'graph')}
 			>
 				Grafo
