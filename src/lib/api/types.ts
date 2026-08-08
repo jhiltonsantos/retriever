@@ -109,3 +109,24 @@ export type UserProfile = {
 	created_at: string;
 	updated_at: string;
 };
+
+// --- Stage 3: Materials graph ---
+export type MaterialGraphNode = {
+	id: string;
+	label: string;
+	source: string;
+	type: 'pdf' | 'text';
+	chunk_count: number;
+};
+
+export type GraphEdge = {
+	source: string;
+	target: string;
+	weight: number;
+	strong: boolean;
+};
+
+export type MaterialsGraphResponse = {
+	nodes: MaterialGraphNode[];
+	edges: GraphEdge[];
+};
