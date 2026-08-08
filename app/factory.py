@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import CORS_ORIGIN_REGEX, CORS_ORIGINS
 from app.db import init_db
-from app.routers import ask, conversations, health, ingest, materials, profile, settings, upload
+from app.routers import ask, conversations, graph, health, ingest, materials, profile, settings, upload
 
 
 @asynccontextmanager
@@ -38,6 +38,7 @@ def create_app() -> FastAPI:
     app.include_router(ingest.router)
     app.include_router(conversations.router)
     app.include_router(materials.router)
+    app.include_router(graph.router)
     app.include_router(profile.router)
 
     return app

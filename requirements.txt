@@ -12,3 +12,4 @@ langchain-text-splitters
 langgraph
 chromadb
 pypdf
+numpy

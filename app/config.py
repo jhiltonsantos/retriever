@@ -26,6 +26,7 @@ RETRIEVER_K = 4
 MAX_RETRIEVAL_LOOPS = int(os.getenv("MAX_RETRIEVAL_LOOPS", "2"))
 EVALUATOR_MIN_SCORE = float(os.getenv("EVALUATOR_MIN_SCORE", "0.6"))
 MAX_HISTORY_MESSAGES = int(os.getenv("MAX_HISTORY_MESSAGES", "10"))
+GRAPH_MUTUAL_KNN_K = int(os.getenv("GRAPH_MUTUAL_KNN_K", "3"))
 
 API_PORT = int(os.getenv("API_PORT", "8000"))
 IS_DESKTOP = os.getenv("DESKTOP_MODE", "0") == "1"
