@@ -1,4 +1,5 @@
 from app.providers.base import LlmProvider
+from app.providers.custom import CustomProvider
 from app.providers.ollama import OllamaProvider
 from app.providers.openrouter import OpenRouterProvider
 from app.settings_store import get_effective_config
@@ -6,6 +7,7 @@ from app.settings_store import get_effective_config
 _PROVIDERS: dict[str, LlmProvider] = {
     "ollama": OllamaProvider(),
     "openrouter": OpenRouterProvider(),
+    "custom": CustomProvider(),
 }
 
 

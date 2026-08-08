@@ -6,25 +6,22 @@ from app.providers._openai_compatible import (
 )
 from app.providers.base import ProviderRequestError
 
-DEFAULT_MODEL = "deepseek/deepseek-v4-flash-0731"  # barato e com tool calling confiavel, ver docs/providers.md
-
-HEADERS = {
-    "HTTP-Referer": "https://github.com/jhiltonsantos/retriever",
-    "X-Title": "Retriever",
-}
-
-LABEL = "OpenRouter"
+LABEL = "Custom"
 
 
-class OpenRouterProvider:
+class CustomProvider:
+    """Qualquer endpoint compativel com a API da OpenAI (LM Studio, vLLM,
+    servidor auto-hospedado, etc). Sem modelo default e sem headers especiais;
+    a chave de API e opcional pois muitos servidores locais nao exigem auth."""
+
     def build_llm(self, *, model, base_url, api_key):
         return build_openai_compatible_llm(
             model=model,
             base_url=base_url,
             api_key=api_key,
-            default_model=DEFAULT_MODEL,
-            require_api_key=True,
-            extra_headers=HEADERS,
+            default_model=None,
+            require_api_key=False,
+            extra_headers=None,
             provider_label=LABEL,
         )
 
@@ -36,9 +33,9 @@ class OpenRouterProvider:
             model=model,
             base_url=base_url,
             api_key=api_key,
-            default_model=DEFAULT_MODEL,
-            require_api_key=True,
-            extra_headers=HEADERS,
+            default_model=None,
+            require_api_key=False,
+            extra_headers=None,
             provider_label=LABEL,
         )
 
