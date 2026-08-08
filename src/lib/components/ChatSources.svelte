@@ -1,13 +1,13 @@
-<div class="collapse collapse-arrow bg-base-200 text-sm">
+<div class="collapse-arrow collapse rounded-2xl bg-[var(--color-surface-container)] text-sm">
 	<input type="checkbox" />
 	<div class="collapse-title">Fontes</div>
 	<div class="collapse-content flex flex-col gap-2">
 		{#each sources as item}
-			<div class="flex flex-col gap-1 border-l-2 border-base-300 pl-2">
-				<span class="font-semibold text-xs text-base-content/90">
+			<div class="flex flex-col gap-1 border-l-2 border-[var(--color-outline-variant)] pl-2">
+				<span class="text-xs font-semibold text-[var(--color-on-surface)]">
 					{item.source}{item.page !== null ? ` · p. ${item.page}` : ''}
 				</span>
-				<p class="text-xs text-base-content/70 m-0">{item.snippet}</p>
+				<p class="m-0 text-xs text-[var(--color-outline)]">{item.snippet}</p>
 			</div>
 		{/each}
 	</div>

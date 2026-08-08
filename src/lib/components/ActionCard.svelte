@@ -1,37 +1,29 @@
 <a
-	class="card bg-base-200 border border-base-300 no-underline text-inherit transition-all hover:border-primary hover:bg-neutral hover:-translate-y-0.5"
+	class="flex flex-1 flex-col justify-between gap-6 self-stretch rounded-[3rem] border border-[var(--color-outline-variant)]/30 bg-[var(--color-surface-container-low)] p-8 text-inherit no-underline shadow-[0_4px_24px_rgba(0,0,0,0.05)] transition-transform hover:-translate-y-1"
 	{href}
 >
-	<div class="card-body gap-3">
-		<span
-			class="badge font-mono w-fit {badgeVariant === 'code' ? 'badge-accent' : 'badge-secondary'}"
-		>
-			{badge}
-		</span>
-		<h2 class="card-title text-lg">{title}</h2>
-		<p class="text-base-content/70 text-sm leading-relaxed flex-1">{description}</p>
-		<span class="link link-primary text-sm font-semibold no-underline">{cta}</span>
+	<span
+		class="flex size-12 items-center justify-center rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+	>
+		<Icon size={20} />
+	</span>
+	<div class="flex flex-col gap-3">
+		<h2 class="m-0 font-['Comfortaa'] text-2xl font-semibold text-[var(--color-on-surface)]">
+			{title}
+		</h2>
+		<p class="m-0 text-sm leading-relaxed text-[var(--color-outline)]">{description}</p>
 	</div>
 </a>
 
 <script lang="ts">
-	type BadgeVariant = 'code' | 'lang';
+	import type { Component } from 'svelte';
 
 	type Props = {
 		href: string;
 		title: string;
 		description: string;
-		badge: string;
-		badgeVariant?: BadgeVariant;
-		cta?: string;
+		icon: Component<{ size?: number | string }>;
 	};
 
-	let {
-		href,
-		title,
-		description,
-		badge,
-		badgeVariant = 'code',
-		cta = 'Abrir →'
-	}: Props = $props();
+	let { href, title, description, icon: Icon }: Props = $props();
 </script>

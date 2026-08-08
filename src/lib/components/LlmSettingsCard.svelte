@@ -1,119 +1,132 @@
-<section class="card bg-base-200 border border-base-300">
-	<div class="card-body gap-4">
-		<header class="flex items-start gap-3">
-			<span class="badge badge-secondary font-mono">LLM</span>
-			<div>
-				<h2 class="card-title text-lg m-0">Provedor de LLM</h2>
-				<p class="text-sm text-base-content/60 mt-1">Escolha onde as respostas são geradas</p>
-			</div>
-		</header>
+<section class="flex flex-col gap-4">
+	<header class="flex items-start gap-3">
+		<span
+			class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+		>
+			<Cpu size={20} />
+		</span>
+		<div>
+			<h2 class="m-0 text-lg font-semibold text-[var(--color-on-surface)]">Provedor de LLM</h2>
+			<p class="mt-1 text-sm text-[var(--color-outline)]">Escolha onde as respostas são geradas</p>
+		</div>
+	</header>
 
-		{#if loading}
-			<div role="status" class="alert alert-info text-sm">
-				<span class="loading loading-spinner loading-sm"></span>
-				<span>Carregando configuração…</span>
-			</div>
-		{:else}
-			<form class="flex flex-col gap-4" onsubmit={onSave}>
-				<div class="flex gap-6">
-					<label class="label cursor-pointer gap-2">
-						<input
-							type="radio"
-							name="provider"
-							class="radio radio-primary"
-							value="ollama"
-							checked={provider === 'ollama'}
-							onchange={() => onProviderChange('ollama')}
-						/>
-						<span class="label-text">Ollama local</span>
-					</label>
-					<label class="label cursor-pointer gap-2">
-						<input
-							type="radio"
-							name="provider"
-							class="radio radio-primary"
-							value="openrouter"
-							checked={provider === 'openrouter'}
-							onchange={() => onProviderChange('openrouter')}
-						/>
-						<span class="label-text">OpenRouter</span>
-					</label>
-				</div>
-
-				<label class="flex flex-col gap-1">
-					<span class="label-text text-sm">Modelo</span>
-					<select
-						class="select select-bordered w-full bg-base-100"
-						bind:value={model}
-						disabled={modelsLoading || models.length === 0}
-					>
-						{#each models as m (m.id)}
-							<option value={m.id}>{m.label}</option>
-						{/each}
-					</select>
-					{#if modelsLoading}
-						<span class="text-xs text-base-content/60">Carregando modelos…</span>
-					{/if}
+	{#if loading}
+		<div role="status" class="alert alert-info text-sm">
+			<span class="loading loading-spinner loading-sm"></span>
+			<span>Carregando configuração…</span>
+		</div>
+	{:else}
+		<form class="flex flex-col gap-4" onsubmit={onSave}>
+			<div class="flex gap-6">
+				<label class="label cursor-pointer gap-2">
+					<input
+						type="radio"
+						name="provider"
+						class="radio radio-primary"
+						value="ollama"
+						checked={provider === 'ollama'}
+						onchange={() => onProviderChange('ollama')}
+					/>
+					<span class="label-text">Ollama local</span>
 				</label>
-
-				<label class="flex flex-col gap-1">
-					<span class="label-text text-sm">Base URL</span>
-					<input type="text" class="input input-bordered w-full bg-base-100" bind:value={baseUrl} />
+				<label class="label cursor-pointer gap-2">
+					<input
+						type="radio"
+						name="provider"
+						class="radio radio-primary"
+						value="openrouter"
+						checked={provider === 'openrouter'}
+						onchange={() => onProviderChange('openrouter')}
+					/>
+					<span class="label-text">OpenRouter</span>
 				</label>
+			</div>
 
-				{#if provider === 'openrouter'}
-					<label class="flex flex-col gap-1">
-						<span class="label-text text-sm">
-							Chave de API
-							{#if apiKeySet}
-								<span class="text-base-content/50 font-normal">(atual: {apiKeyMasked})</span>
-							{/if}
-						</span>
-						<input
-							type="password"
-							class="input input-bordered w-full bg-base-100"
-							placeholder={apiKeySet ? 'Deixe em branco para manter a atual' : 'sk-or-...'}
-							bind:value={apiKey}
-						/>
-					</label>
+			<label class="flex flex-col gap-1">
+				<span class="label-text text-sm">Modelo</span>
+				<select
+					class="select w-full bg-[var(--color-surface-container-lowest)]"
+					bind:value={model}
+					disabled={modelsLoading || models.length === 0}
+				>
+					{#each models as m (m.id)}
+						<option value={m.id}>{m.label}</option>
+					{/each}
+				</select>
+				{#if modelsLoading}
+					<span class="text-xs text-[var(--color-outline)]">Carregando modelos…</span>
 				{/if}
+			</label>
 
-				<div class="flex gap-3">
-					<button type="button" class="btn btn-outline" onclick={onTest} disabled={testing || !model}>
-						{testing ? 'Testando…' : 'Testar conexão'}
-					</button>
-					<button type="submit" class="btn btn-primary" disabled={saving || !model}>
-						{saving ? 'Salvando…' : 'Salvar'}
-					</button>
-				</div>
-			</form>
-		{/if}
+			<label class="flex flex-col gap-1">
+				<span class="label-text text-sm">Base URL</span>
+				<input
+					type="text"
+					class="input w-full bg-[var(--color-surface-container-lowest)]"
+					bind:value={baseUrl}
+				/>
+			</label>
 
-		{#if testResult}
-			<div
-				role="status"
-				class="alert {testResult.ok ? 'alert-success' : 'alert-error'} text-sm"
-			>
-				<span>{testResult.message}</span>
+			{#if provider === 'openrouter'}
+				<label class="flex flex-col gap-1">
+					<span class="label-text text-sm">
+						Chave de API
+						{#if apiKeySet}
+							<span class="font-normal opacity-70">(atual: {apiKeyMasked})</span>
+						{/if}
+					</span>
+					<input
+						type="password"
+						class="input w-full bg-[var(--color-surface-container-lowest)]"
+						placeholder={apiKeySet ? 'Deixe em branco para manter a atual' : 'sk-or-...'}
+						bind:value={apiKey}
+					/>
+				</label>
+			{/if}
+
+			<div class="flex gap-3">
+				<button
+					type="button"
+					class="btn btn-outline rounded-full"
+					onclick={onTest}
+					disabled={testing || !model}
+				>
+					{testing ? 'Testando…' : 'Testar conexão'}
+				</button>
+				<button
+					type="submit"
+					class="btn rounded-full border-none bg-[var(--color-primary)] text-[var(--color-primary-content)]"
+					disabled={saving || !model}
+				>
+					{saving ? 'Salvando…' : 'Salvar'}
+				</button>
 			</div>
-		{/if}
+		</form>
+	{/if}
 
-		{#if saveError}
-			<div role="alert" class="alert alert-error text-sm">
-				<span>{saveError}</span>
-			</div>
-		{/if}
+	{#if testResult}
+		<div role="status" class="alert {testResult.ok ? 'alert-success' : 'alert-error'} text-sm">
+			<span>{testResult.message}</span>
+		</div>
+	{/if}
 
-		{#if saved}
-			<div role="status" class="alert alert-success text-sm">
-				<span>Configuração salva.</span>
-			</div>
-		{/if}
-	</div>
+	{#if saveError}
+		<div role="alert" class="alert alert-error text-sm">
+			<span>{saveError}</span>
+		</div>
+	{/if}
+
+	{#if saved}
+		<div role="status" class="alert alert-success text-sm">
+			<span>Configuração salva.</span>
+		</div>
+	{/if}
 </section>
 
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { Cpu } from '@lucide/svelte';
 	import { getLlmModels, getLlmSettings, testLlmConnection, updateLlmSettings } from '$lib/api/settings';
 	import type { LlmModel, LlmProviderId, TestConnectionResult } from '$lib/settings/types';
 

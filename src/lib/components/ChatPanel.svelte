@@ -1,36 +1,34 @@
-<section class="card bg-base-200 border border-base-300 h-full flex flex-col min-h-0">
-	<div class="card-body gap-4 flex-1 min-h-0 flex flex-col">
-		<div
-			class="flex-1 min-h-0 flex flex-col gap-3 overflow-y-auto p-1"
-			bind:this={threadEl}
-		>
-			{#if messages.length === 0}
-				<p class="m-auto max-w-80 text-center text-sm text-base-content/60">
-					Nenhuma mensagem ainda. Faça uma pergunta sobre os PDFs que você indexou.
-				</p>
-			{:else}
-				{#each messages as message (message.id)}
-					<ChatMessage {message} />
-				{/each}
-			{/if}
-		</div>
-
-		<ChatComposer bind:value={question} {submitting} onSubmit={handleSubmit} />
+<div class="relative flex h-full min-h-0 flex-1 flex-col">
+	<div
+		class="mx-auto flex w-full max-w-[896px] min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-40"
+		bind:this={threadEl}
+	>
+		{#if messages.length === 0}
+			<p class="m-auto max-w-80 text-center text-sm text-[var(--color-outline)]">
+				Nenhuma mensagem ainda. Faça uma pergunta sobre os PDFs que você indexou.
+			</p>
+		{:else}
+			{#each messages as message (message.id)}
+				<ChatMessage {message} />
+			{/each}
+		{/if}
 
 		{#if submitting}
-			<div role="status" class="alert alert-info text-sm">
+			<div role="status" class="alert alert-info mx-auto w-full max-w-[896px] text-sm">
 				<span class="loading loading-spinner loading-sm"></span>
 				<span>Consultando ChromaDB e gerando resposta com Ollama…</span>
 			</div>
 		{/if}
 
 		{#if error}
-			<div role="alert" class="alert alert-error text-sm">
+			<div role="alert" class="alert alert-error mx-auto w-full max-w-[896px] text-sm">
 				<span>{error}</span>
 			</div>
 		{/if}
 	</div>
-</section>
+
+	<ChatComposer bind:value={question} {submitting} onSubmit={handleSubmit} />
+</div>
 
 <script lang="ts">
 	import { onMount } from 'svelte';
@@ -41,6 +39,12 @@
 	import ChatComposer from './ChatComposer.svelte';
 	import ChatMessage from './ChatMessage.svelte';
 
+	type Props = {
+		initialQuestion?: string;
+	};
+
+	let { initialQuestion }: Props = $props();
+
 	let submitting = $state(false);
 	let question = $state('');
 	let error = $state<string | null>(null);
@@ -49,6 +53,11 @@
 
 	onMount(() => {
 		messages = loadChatSession().messages;
+
+		if (initialQuestion && messages.length === 0) {
+			question = initialQuestion;
+			handleSubmit();
+		}
 	});
 
 	$effect(() => {

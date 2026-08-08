@@ -1,33 +1,140 @@
 @import 'tailwindcss';
+
+@import '@fontsource/open-sans/400.css';
+@import '@fontsource/open-sans/600.css';
+@import '@fontsource/open-sans/700.css';
+@import '@fontsource/comfortaa/400.css';
+@import '@fontsource/comfortaa/600.css';
+@import '@fontsource/comfortaa/700.css';
+
 @plugin 'daisyui' {
-	themes: retriever --default;
+	themes: retriever --default, retriever-dark;
+}
+
+/* daisyUI theme blocks only recognize color/radius/size tokens -- a plain
+   font-family declaration inside @plugin 'daisyui/theme' is silently
+   dropped (verified against the compiled CSS), so the base font is set
+   globally here instead. Both themes use the same body font, so this
+   doesn't need to vary per theme. */
+@layer base {
+	html {
+		font-family: 'Open Sans', ui-sans-serif, system-ui, sans-serif;
+	}
 }
 
 @plugin 'daisyui/theme' {
 	name: 'retriever';
 	default: true;
+	prefersdark: false;
+	color-scheme: light;
+
+	--color-base-100: #f8f9ff;
+	--color-base-200: #eff4ff;
+	--color-base-300: #dce9ff;
+	--color-base-content: #0b1c30;
+
+	--color-primary: #8d4b00;
+	--color-primary-content: #ffffff;
+
+	--color-secondary: #565e74;
+	--color-secondary-content: #ffffff;
+
+	--color-accent: #665f3d;
+	--color-accent-content: #ffffff;
+
+	--color-neutral: #d3e4fe;
+	--color-neutral-content: #0b1c30;
+
+	--color-info: #3b82f6;
+	--color-info-content: #ffffff;
+
+	--color-success: #16a34a;
+	--color-success-content: #ffffff;
+
+	--color-warning: #d97706;
+	--color-warning-content: #ffffff;
+
+	--color-error: #ba1a1a;
+	--color-error-content: #ffffff;
+
+	--radius-box: 3rem;
+	--radius-field: 1.5rem;
+	--radius-selector: 0.25rem;
+	--depth: 0;
+	--noise: 0;
+
+	/* Tokens extras do Material-Design-3, sem slot padrao no daisyUI.
+	   Usados via utilitario arbitrario do Tailwind: bg-[var(--color-surface-container)] */
+	--color-surface: #f8f9ff;
+	--color-surface-dim: #cbdbf5;
+	--color-surface-bright: #f8f9ff;
+	--color-surface-container-lowest: #ffffff;
+	--color-surface-container-low: #eff4ff;
+	--color-surface-container: #e5eeff;
+	--color-surface-container-high: #dce9ff;
+	--color-surface-container-highest: #d3e4fe;
+	--color-surface-variant: #d3e4fe;
+	--color-on-surface: #0b1c30;
+	--color-on-surface-variant: #554336;
+	--color-outline: #887364;
+	--color-outline-variant: #dbc2b0;
+	--color-surface-tint: #904d00;
+	--color-primary-container: #b15f00;
+	--color-on-primary-container: #fffbff;
+	--color-secondary-container: #dae2fd;
+	--color-on-secondary-container: #5c647a;
+	--color-tertiary-container: #b5ac84;
+	--color-on-tertiary-container: #464021;
+	--color-error-container: #ffdad6;
+	--color-on-error-container: #93000a;
+	--color-primary-fixed: #ffdcc3;
+	--color-primary-fixed-dim: #ffb77d;
+	--color-on-primary-fixed: #2f1500;
+	--color-on-primary-fixed-variant: #6e3900;
+	--color-secondary-fixed: #dae2fd;
+	--color-secondary-fixed-dim: #bec6e0;
+	--color-on-secondary-fixed: #131b2e;
+	--color-on-secondary-fixed-variant: #3f465c;
+	--color-tertiary-fixed: #ede3b8;
+	--color-tertiary-fixed-dim: #d1c79d;
+	--color-on-tertiary-fixed: #201c02;
+	--color-on-tertiary-fixed-variant: #4d4727;
+	--color-inverse-surface: #213145;
+	--color-inverse-on-surface: #eaf1ff;
+	--color-inverse-primary: #ffb77d;
+	--color-background: #f8f9ff;
+	--color-on-background: #0b1c30;
+}
+
+@plugin 'daisyui/theme' {
+	name: 'retriever-dark';
+	default: false;
 	prefersdark: true;
 	color-scheme: dark;
 
-	--color-base-100: #0f1419;
-	--color-base-200: #1a2332;
-	--color-base-300: #2d3a4f;
-	--color-base-content: #e8edf4;
+	/* Derivado dos tokens inverse-x e fixed(-dim) que ja existem no YAML
+	   claro de DESIGN.md -- sao os proprios companions MD3 do modo escuro,
+	   nao valores inventados. Passos tonais intermediarios escalonados a
+	   partir de inverse-surface (#213145), mantendo a mesma matiz navy. */
+	--color-base-100: #213145;
+	--color-base-200: #182535;
+	--color-base-300: #2c3f57;
+	--color-base-content: #eaf1ff;
 
-	--color-primary: #d97706;
-	--color-primary-content: #0f1419;
+	--color-primary: #ffb77d;
+	--color-primary-content: #2f1500;
 
-	--color-secondary: #34d399;
-	--color-secondary-content: #0f1419;
+	--color-secondary: #bec6e0;
+	--color-secondary-content: #131b2e;
 
-	--color-accent: #a78bfa;
-	--color-accent-content: #0f1419;
+	--color-accent: #d1c79d;
+	--color-accent-content: #201c02;
 
-	--color-neutral: #243044;
-	--color-neutral-content: #8b9cb3;
+	--color-neutral: #2c3f57;
+	--color-neutral-content: #eaf1ff;
 
 	--color-info: #3b82f6;
-	--color-info-content: #e8edf4;
+	--color-info-content: #ffffff;
 
 	--color-success: #22c55e;
 	--color-success-content: #0f1419;
@@ -35,10 +142,52 @@
 	--color-warning: #f59e0b;
 	--color-warning-content: #0f1419;
 
-	--color-error: #ef4444;
-	--color-error-content: #ffffff;
+	--color-error: #ffb4ab;
+	--color-error-content: #690005;
 
-	--radius-box: 0.625rem;
-	--radius-field: 0.625rem;
-	--radius-selector: 0.375rem;
+	--radius-box: 3rem;
+	--radius-field: 1.5rem;
+	--radius-selector: 0.25rem;
+	--depth: 0;
+	--noise: 0;
+
+	--color-surface: #213145;
+	--color-surface-dim: #16212f;
+	--color-surface-bright: #384a63;
+	--color-surface-container-lowest: #0d1520;
+	--color-surface-container-low: #182535;
+	--color-surface-container: #213145;
+	--color-surface-container-high: #2c3f57;
+	--color-surface-container-highest: #374f6c;
+	--color-surface-variant: #2c3f57;
+	--color-on-surface: #eaf1ff;
+	--color-on-surface-variant: #d6c3b3;
+	--color-outline: #a89383;
+	--color-outline-variant: #4a3c30;
+	--color-surface-tint: #ffb77d;
+	--color-primary-container: #6e3900;
+	--color-on-primary-container: #ffdcc3;
+	--color-secondary-container: #3f465c;
+	--color-on-secondary-container: #dae2fd;
+	--color-tertiary-container: #4d4727;
+	--color-on-tertiary-container: #ede3b8;
+	--color-error-container: #93000a;
+	--color-on-error-container: #ffdad6;
+	--color-primary-fixed: #ffdcc3;
+	--color-primary-fixed-dim: #ffb77d;
+	--color-on-primary-fixed: #2f1500;
+	--color-on-primary-fixed-variant: #6e3900;
+	--color-secondary-fixed: #dae2fd;
+	--color-secondary-fixed-dim: #bec6e0;
+	--color-on-secondary-fixed: #131b2e;
+	--color-on-secondary-fixed-variant: #3f465c;
+	--color-tertiary-fixed: #ede3b8;
+	--color-tertiary-fixed-dim: #d1c79d;
+	--color-on-tertiary-fixed: #201c02;
+	--color-on-tertiary-fixed-variant: #4d4727;
+	--color-inverse-surface: #f8f9ff;
+	--color-inverse-on-surface: #0b1c30;
+	--color-inverse-primary: #8d4b00;
+	--color-background: #213145;
+	--color-on-background: #eaf1ff;
 }

@@ -1,12 +1,10 @@
-<PageNav title="Configurações" />
-
-<main class="w-full max-w-lg mx-auto flex flex-col gap-5">
+<div class="flex flex-col gap-8">
 	<LlmSettingsCard />
+	<div class="h-px bg-[var(--color-outline-variant)]/30"></div>
 	<EmbeddingsInfoPanel />
-</main>
+</div>
 
 <script lang="ts">
-	import PageNav from '$lib/components/PageNav.svelte';
 	import LlmSettingsCard from '$lib/components/LlmSettingsCard.svelte';
 	import EmbeddingsInfoPanel from '$lib/components/EmbeddingsInfoPanel.svelte';
 </script>

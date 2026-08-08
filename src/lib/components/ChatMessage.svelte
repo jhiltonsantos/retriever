@@ -2,14 +2,14 @@
 	class="chat {message.role === 'user' ? 'chat-end' : 'chat-start'}"
 	aria-label="{label}: {message.content}"
 >
-	<div class="chat-header text-xs opacity-70">
+	<div class="chat-header text-xs text-[var(--color-outline)]">
 		{label}
 		<time class="text-xs" datetime={message.createdAt}>{time}</time>
 	</div>
 	<div
 		class="chat-bubble whitespace-pre-wrap leading-relaxed {message.role === 'user'
-			? 'chat-bubble-primary'
-			: 'chat-bubble-neutral'}"
+			? 'bg-[var(--color-primary)] text-[var(--color-primary-content)]'
+			: 'bg-[var(--color-surface-container)] text-[var(--color-on-surface)]'}"
 	>
 		{message.content}
 	</div>

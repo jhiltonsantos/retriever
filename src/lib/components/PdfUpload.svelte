@@ -1,53 +1,60 @@
-<section class="card bg-base-200 border border-base-300">
-	<div class="card-body gap-4">
-		<header class="flex items-start gap-3">
-			<span class="badge badge-accent font-mono">{'{ }'}</span>
+<section class="flex flex-col gap-4">
+	<header class="flex items-start gap-3">
+		<span
+			class="flex size-12 shrink-0 items-center justify-center rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+		>
+			<Database size={20} />
+		</span>
+		<div>
+			<h2 class="m-0 text-lg font-semibold text-[var(--color-on-surface)]">Materiais de estudo</h2>
+			<p class="mt-1 text-sm text-[var(--color-outline)]">PDF · Programação &amp; Inglês</p>
+		</div>
+	</header>
+
+	<form class="flex flex-col gap-3" onsubmit={onSubmit}>
+		<input
+			type="file"
+			class="file-input w-full bg-[var(--color-surface-container-lowest)]"
+			accept=".pdf,application/pdf"
+			onchange={onFileChange}
+			disabled={uploading}
+		/>
+		<button
+			type="submit"
+			class="btn self-start rounded-full border-none bg-[var(--color-primary)] text-[var(--color-primary-content)]"
+			disabled={uploading || !selectedFile}
+		>
+			{uploading ? 'Indexando…' : 'Enviar PDF'}
+		</button>
+	</form>
+
+	{#if uploading}
+		<div role="status" class="alert alert-info text-sm">
+			<span class="loading loading-spinner loading-sm"></span>
+			<span>Extraindo texto e gerando embeddings — pode levar alguns minutos.</span>
+		</div>
+	{/if}
+
+	{#if error}
+		<div role="alert" class="alert alert-error text-sm">
+			<span>{error}</span>
+		</div>
+	{/if}
+
+	{#if result}
+		<div role="status" class="alert alert-success text-sm">
 			<div>
-				<h2 class="card-title text-lg m-0">Materiais de estudo</h2>
-				<p class="text-sm text-base-content/60 mt-1">PDF · Programação &amp; Inglês</p>
+				<p class="m-0">{result.message}</p>
+				<p class="mt-2 m-0 text-sm opacity-80">
+					<strong>{result.filename}</strong> · {result.chunks_indexed} trechos indexados
+				</p>
 			</div>
-		</header>
-
-		<form class="flex flex-col gap-3" onsubmit={onSubmit}>
-			<input
-				type="file"
-				class="file-input file-input-bordered w-full bg-base-100"
-				accept=".pdf,application/pdf"
-				onchange={onFileChange}
-				disabled={uploading}
-			/>
-			<button type="submit" class="btn btn-primary self-start" disabled={uploading || !selectedFile}>
-				{uploading ? 'Indexando…' : 'Enviar PDF'}
-			</button>
-		</form>
-
-		{#if uploading}
-			<div role="status" class="alert alert-info text-sm">
-				<span class="loading loading-spinner loading-sm"></span>
-				<span>Extraindo texto e gerando embeddings — pode levar alguns minutos.</span>
-			</div>
-		{/if}
-
-		{#if error}
-			<div role="alert" class="alert alert-error text-sm">
-				<span>{error}</span>
-			</div>
-		{/if}
-
-		{#if result}
-			<div role="status" class="alert alert-success text-sm">
-				<div>
-					<p class="m-0">{result.message}</p>
-					<p class="text-base-content/60 text-sm mt-2 m-0">
-						<strong>{result.filename}</strong> · {result.chunks_indexed} trechos indexados
-					</p>
-				</div>
-			</div>
-		{/if}
-	</div>
+		</div>
+	{/if}
 </section>
 
 <script lang="ts">
+	import { Database } from '@lucide/svelte';
 	import { uploadPdf } from '$lib/api/upload';
 	import type { UploadResponse } from '$lib/api/types';
 
