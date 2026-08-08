@@ -1,8 +1,6 @@
 # Retriever Web
 
-Frontend SvelteKit do assistente de estudos **Retriever** — interface conectada ao RAG (FastAPI, LangChain, ChromaDB e Ollama).
-
-Este submodule faz parte do monorepo [retriever](https://github.com/jhiltonsantos/retriever), onde vive a documentação completa.
+Frontend SvelteKit do assistente de estudos **Retriever** com interface conectada ao RAG (FastAPI, LangChain, ChromaDB e Ollama).
 
 ## Stack de UI
 
