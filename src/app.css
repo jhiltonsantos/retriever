@@ -112,13 +112,13 @@
 	prefersdark: true;
 	color-scheme: dark;
 
-	/* Derivado dos tokens inverse-x e fixed(-dim) que ja existem no YAML
-	   claro de DESIGN.md -- sao os proprios companions MD3 do modo escuro,
-	   nao valores inventados. Passos tonais intermediarios escalonados a
-	   partir de inverse-surface (#213145), mantendo a mesma matiz navy. */
-	--color-base-100: #213145;
-	--color-base-200: #182535;
-	--color-base-300: #2c3f57;
+	/* Escala de cinza neutro (R=G=B, sem matiz) nos mesmos degraus tonais que
+	   a escala anterior derivada de inverse-surface (#213145, azul-marinho).
+	   Os tokens de acento/conteudo (primary, on-surface, outline, fixed-x)
+	   continuam vindo do YAML claro de DESIGN.md e nao mudam aqui. */
+	--color-base-100: #232323;
+	--color-base-200: #1c1c1c;
+	--color-base-300: #2e2e2e;
 	--color-base-content: #eaf1ff;
 
 	--color-primary: #ffb77d;
@@ -130,7 +130,7 @@
 	--color-accent: #d1c79d;
 	--color-accent-content: #201c02;
 
-	--color-neutral: #2c3f57;
+	--color-neutral: #2e2e2e;
 	--color-neutral-content: #eaf1ff;
 
 	--color-info: #3b82f6;
@@ -151,15 +151,15 @@
 	--depth: 0;
 	--noise: 0;
 
-	--color-surface: #213145;
-	--color-surface-dim: #16212f;
-	--color-surface-bright: #384a63;
-	--color-surface-container-lowest: #0d1520;
-	--color-surface-container-low: #182535;
-	--color-surface-container: #213145;
-	--color-surface-container-high: #2c3f57;
-	--color-surface-container-highest: #374f6c;
-	--color-surface-variant: #2c3f57;
+	--color-surface: #232323;
+	--color-surface-dim: #161616;
+	--color-surface-bright: #4a4a4a;
+	--color-surface-container-lowest: #121212;
+	--color-surface-container-low: #1c1c1c;
+	--color-surface-container: #232323;
+	--color-surface-container-high: #383838;
+	--color-surface-container-highest: #454545;
+	--color-surface-variant: #2e2e2e;
 	--color-on-surface: #eaf1ff;
 	--color-on-surface-variant: #d6c3b3;
 	--color-outline: #a89383;
@@ -188,6 +188,6 @@
 	--color-inverse-surface: #f8f9ff;
 	--color-inverse-on-surface: #0b1c30;
 	--color-inverse-primary: #8d4b00;
-	--color-background: #213145;
+	--color-background: #232323;
 	--color-on-background: #eaf1ff;
 }

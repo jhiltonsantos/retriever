@@ -36,7 +36,7 @@
 			{:else}
 				{#each recentConversations as conv (conv.id)}
 					<a
-						href="/chat"
+						href="/chat?conv={conv.id}"
 						class="truncate rounded-r-full px-5 py-2 text-sm text-[var(--color-on-surface-variant)] no-underline hover:bg-[var(--color-surface-container)]"
 					>
 						{conv.title}
@@ -64,11 +64,12 @@
 </aside>
 
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { Home, Database, Folder, History, Settings, CircleHelp, Plus } from '@lucide/svelte';
 	import favicon from '$lib/assets/favicon.svg';
-	import { listRecentConversations, startNewConversation } from '$lib/chat/conversations';
+	import { listRecentConversations, loadConversations } from '$lib/chat/conversations';
 
 	const mainItems = [
 		{ href: '/', label: 'Início', icon: Home },
@@ -84,18 +85,15 @@
 
 	const recentConversations = $derived(listRecentConversations());
 
+	onMount(() => {
+		loadConversations();
+	});
+
 	function isActive(href: string): boolean {
 		return href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href);
 	}
 
 	function onNewChat() {
-		if (
-			recentConversations.length > 0 &&
-			!confirm('Iniciar uma nova conversa? A conversa atual será apagada.')
-		) {
-			return;
-		}
-		startNewConversation();
 		goto('/chat');
 	}
 </script>

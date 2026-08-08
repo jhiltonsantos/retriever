@@ -24,6 +24,7 @@
 		{/if}
 	</div>
 </div>
+<AlertModal />
 
 <script lang="ts">
 	import { onMount } from 'svelte';
@@ -32,6 +33,7 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import SideNav from '$lib/components/SideNav.svelte';
 	import RouteModal from '$lib/components/RouteModal.svelte';
+	import AlertModal from '$lib/components/AlertModal.svelte';
 	import HomeCanvas from '$lib/components/HomeCanvas.svelte';
 	import ChatCanvas from '$lib/components/ChatCanvas.svelte';
 	import { isModalRoute, getBackgroundPath, setBackgroundPath } from '$lib/nav/background.svelte';

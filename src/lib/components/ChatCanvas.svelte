@@ -10,15 +10,28 @@
 			Limpar
 		</button>
 	</div>
-	<ChatPanel bind:this={chatPanel} {initialQuestion} />
+	<ChatPanel
+		bind:this={chatPanel}
+		{initialQuestion}
+		conversationId={currentConversationId}
+		onConversationCreated={onConversationCreated}
+	/>
 </div>
 
 <script lang="ts">
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import TopBar from './TopBar.svelte';
 	import OllamaStatus from './OllamaStatus.svelte';
 	import ChatPanel from './ChatPanel.svelte';
 
 	let chatPanel = $state<ChatPanel | undefined>(undefined);
 	const initialQuestion = $derived(page.url.searchParams.get('q') ?? undefined);
+	const currentConversationId = $derived(page.url.searchParams.get('conv') ?? undefined);
+
+	function onConversationCreated(id: string) {
+		const url = new URL(page.url);
+		url.searchParams.set('conv', id);
+		goto(url.toString(), { replaceState: true });
+	}
 </script>

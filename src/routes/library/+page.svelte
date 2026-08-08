@@ -10,7 +10,7 @@
 	</div>
 {:else if error}
 	<div role="alert" class="alert alert-error text-sm"><span>{error}</span></div>
-{:else if documents.length === 0}
+{:else if materials.length === 0}
 	<div class="flex flex-col items-center gap-3 py-12 text-center">
 		<span
 			class="flex size-12 items-center justify-center rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
@@ -30,10 +30,23 @@
 	</div>
 {:else}
 	<ul class="m-0 flex list-none flex-col gap-2 p-0">
-		{#each documents as doc (doc.source)}
-			<li class="flex items-center justify-between rounded-2xl bg-[var(--color-surface-container)] px-4 py-3 text-sm">
-				<span class="truncate">{doc.source}</span>
-				<span class="badge badge-ghost">{doc.type === 'pdf' ? 'PDF' : 'Texto'} · {doc.chunks} trechos</span>
+		{#each materials as material (material.id)}
+			<li class="group flex items-center justify-between rounded-2xl bg-[var(--color-surface-container)] px-4 py-3 text-sm">
+				<div class="flex min-w-0 flex-col gap-0.5">
+					<span class="truncate font-medium text-[var(--color-on-surface)]">{material.title ?? material.source}</span>
+					<span class="truncate text-xs text-[var(--color-outline)]">{material.source}</span>
+				</div>
+				<div class="flex shrink-0 items-center gap-2">
+					<span class="badge badge-ghost">{material.type === 'pdf' ? 'PDF' : 'Texto'} · {material.chunk_count} trechos</span>
+					<button
+						type="button"
+						class="btn btn-ghost btn-circle btn-xs opacity-0 group-hover:opacity-100"
+						aria-label="Excluir material"
+						onclick={() => onDelete(material.id)}
+					>
+						<Trash2 size={16} class="text-error" />
+					</button>
+				</div>
 			</li>
 		{/each}
 	</ul>
@@ -41,21 +54,47 @@
 
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { FolderOpen } from '@lucide/svelte';
-	import { getDocuments } from '$lib/api/ingest';
-	import type { DocumentInfo } from '$lib/api/types';
+	import { FolderOpen, Trash2 } from '@lucide/svelte';
+	import { listMaterials, deleteMaterial } from '$lib/api/materials';
+	import type { MaterialInfo } from '$lib/api/types';
+	import { showConfirm } from '$lib/alerts.svelte';
 
-	let documents = $state<DocumentInfo[]>([]);
+	let materials = $state<MaterialInfo[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 
 	onMount(async () => {
+		await loadMaterials();
+	});
+
+	async function loadMaterials() {
+		loading = true;
+		error = null;
 		try {
-			documents = (await getDocuments()).documents;
+			const response = await listMaterials();
+			materials = response.materials;
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Erro ao carregar materiais.';
 		} finally {
 			loading = false;
 		}
-	});
+	}
+
+	async function onDelete(id: string) {
+		if (
+			!(await showConfirm('Excluir este material permanentemente?', {
+				confirmLabel: 'Excluir',
+				variant: 'error'
+			}))
+		) {
+			return;
+		}
+
+		try {
+			await deleteMaterial(id);
+			await loadMaterials();
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Erro ao excluir material.';
+		}
+	}
 </script>

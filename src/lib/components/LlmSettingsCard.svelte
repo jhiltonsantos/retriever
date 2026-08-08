@@ -41,6 +41,17 @@
 					/>
 					<span class="label-text">OpenRouter</span>
 				</label>
+				<label class="label cursor-pointer gap-2">
+					<input
+						type="radio"
+						name="provider"
+						class="radio radio-primary"
+						value="custom"
+						checked={provider === 'custom'}
+						onchange={() => onProviderChange('custom')}
+					/>
+					<span class="label-text">Custom</span>
+				</label>
 			</div>
 
 			<label class="flex flex-col gap-1">
@@ -64,11 +75,12 @@
 				<input
 					type="text"
 					class="input w-full bg-[var(--color-surface-container-lowest)]"
+					placeholder={provider === 'custom' ? 'https://meu-servidor/v1' : ''}
 					bind:value={baseUrl}
 				/>
 			</label>
 
-			{#if provider === 'openrouter'}
+			{#if provider === 'openrouter' || provider === 'custom'}
 				<label class="flex flex-col gap-1">
 					<span class="label-text text-sm">
 						Chave de API
@@ -79,7 +91,11 @@
 					<input
 						type="password"
 						class="input w-full bg-[var(--color-surface-container-lowest)]"
-						placeholder={apiKeySet ? 'Deixe em branco para manter a atual' : 'sk-or-...'}
+						placeholder={apiKeySet
+							? 'Deixe em branco para manter a atual'
+							: provider === 'custom'
+								? 'Opcional'
+								: 'sk-or-...'}
 						bind:value={apiKey}
 					/>
 				</label>
@@ -90,14 +106,14 @@
 					type="button"
 					class="btn btn-outline rounded-full"
 					onclick={onTest}
-					disabled={testing || !model}
+					disabled={testing || !model || (provider === 'custom' && !baseUrl)}
 				>
 					{testing ? 'Testando…' : 'Testar conexão'}
 				</button>
 				<button
 					type="submit"
 					class="btn rounded-full border-none bg-[var(--color-primary)] text-[var(--color-primary-content)]"
-					disabled={saving || !model}
+					disabled={saving || !model || (provider === 'custom' && !baseUrl)}
 				>
 					{saving ? 'Salvando…' : 'Salvar'}
 				</button>
@@ -128,14 +144,10 @@
 	import { onMount } from 'svelte';
 	import { Cpu } from '@lucide/svelte';
 	import { getLlmModels, getLlmSettings, testLlmConnection, updateLlmSettings } from '$lib/api/settings';
-	import type { LlmModel, LlmProviderId, TestConnectionResult } from '$lib/settings/types';
-
-	const DEFAULT_BASE_URLS: Record<LlmProviderId, string> = {
-		ollama: 'http://localhost:11434',
-		openrouter: 'https://openrouter.ai/api/v1'
-	};
+	import type { LlmModel, LlmProviderId, LlmSettings, TestConnectionResult } from '$lib/settings/types';
 
 	let loading = $state(true);
+	let settings = $state<LlmSettings | null>(null);
 	let provider = $state<LlmProviderId>('ollama');
 	let model = $state('');
 	let baseUrl = $state('');
@@ -153,14 +165,20 @@
 	let testing = $state(false);
 	let testResult = $state<TestConnectionResult | null>(null);
 
+	function applyProviderToForm(p: LlmProviderId) {
+		const cfg = settings!.providers[p];
+		model = cfg.model ?? '';
+		baseUrl = cfg.base_url;
+		apiKey = '';
+		apiKeyMasked = cfg.api_key_masked;
+		apiKeySet = cfg.api_key_set;
+	}
+
 	onMount(async () => {
 		try {
-			const settings = await getLlmSettings();
-			provider = settings.provider;
-			model = settings.model ?? '';
-			baseUrl = settings.base_url;
-			apiKeyMasked = settings.api_key_masked;
-			apiKeySet = settings.api_key_set;
+			settings = await getLlmSettings();
+			provider = settings.active_provider;
+			applyProviderToForm(provider);
 		} finally {
 			loading = false;
 		}
@@ -184,7 +202,7 @@
 
 	function onProviderChange(next: LlmProviderId) {
 		provider = next;
-		baseUrl = DEFAULT_BASE_URLS[next];
+		applyProviderToForm(next);
 		saved = false;
 		testResult = null;
 		loadModels(next);
@@ -196,15 +214,13 @@
 		saveError = null;
 		saved = false;
 		try {
-			const settings = await updateLlmSettings({
+			settings = await updateLlmSettings({
 				provider,
 				model,
 				base_url: baseUrl || null,
 				api_key: apiKey || null
 			});
-			apiKeyMasked = settings.api_key_masked;
-			apiKeySet = settings.api_key_set;
-			apiKey = '';
+			applyProviderToForm(provider);
 			saved = true;
 		} catch (err) {
 			saveError = err instanceof Error ? err.message : 'Erro ao salvar as configurações.';
