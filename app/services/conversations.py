@@ -13,7 +13,12 @@ def _now() -> str:
 def list_conversations() -> list[dict]:
     with get_connection() as conn:
         rows = conn.execute(
-            "SELECT id, title, created_at, updated_at FROM conversations ORDER BY updated_at DESC"
+            """SELECT c.id, c.title, c.created_at, c.updated_at,
+                      COUNT(m.id) AS message_count
+               FROM conversations c
+               LEFT JOIN messages m ON m.conversation_id = c.id
+               GROUP BY c.id
+               ORDER BY c.updated_at DESC"""
         ).fetchall()
     return [dict(row) for row in rows]
 
@@ -45,7 +50,13 @@ def create_conversation(title: str) -> dict:
             "INSERT INTO conversations (id, title, created_at, updated_at) VALUES (?, ?, ?, ?)",
             (conversation_id, title, now, now),
         )
-    return {"id": conversation_id, "title": title, "created_at": now, "updated_at": now}
+    return {
+        "id": conversation_id,
+        "title": title,
+        "created_at": now,
+        "updated_at": now,
+        "message_count": 0,
+    }
 
 
 def delete_conversation(conversation_id: str) -> bool:

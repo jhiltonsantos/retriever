@@ -62,6 +62,10 @@ def get_connection():
     is_new = not DB_PATH.exists()
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    # sqlite3 nao aplica FOREIGN KEY/ON DELETE CASCADE por padrao -- precisa
+    # ser ligado em toda conexao, senao apagar uma conversa deixa mensagens
+    # orfas na tabela messages para sempre.
+    conn.execute("PRAGMA foreign_keys = ON")
     try:
         conn.executescript(SCHEMA_SQL)
         if is_new:
