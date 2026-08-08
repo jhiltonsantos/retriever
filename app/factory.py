@@ -1,8 +1,17 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import CORS_ORIGINS
-from app.routers import ask, health, ingest, settings, upload
+from app.db import init_db
+from app.routers import ask, conversations, health, ingest, materials, profile, settings, upload
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_db()
+    yield
 
 
 def create_app() -> FastAPI:
@@ -10,6 +19,7 @@ def create_app() -> FastAPI:
         title="Retriever API",
         description="Assistente de estudos local com RAG para Programação e Inglês",
         version="0.2.0",
+        lifespan=lifespan,
     )
 
     app.add_middleware(
@@ -25,5 +35,8 @@ def create_app() -> FastAPI:
     app.include_router(ask.router)
     app.include_router(settings.router)
     app.include_router(ingest.router)
+    app.include_router(conversations.router)
+    app.include_router(materials.router)
+    app.include_router(profile.router)
 
     return app

@@ -7,6 +7,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter # pyright: i
 
 from app.config import CHUNK_OVERLAP, CHUNK_SIZE
 from app.dependencies import get_vectorstore
+from app.services.materials import record_material
 from app.services.pdf import delete_temp_pdf
 
 
@@ -42,6 +43,7 @@ def ingest_pdf(file_path: Path, filename: str) -> dict:
             if count
             else "PDF processado, mas nenhum texto foi extraído."
         )
+        record_material(source=filename, type="pdf", title=filename, chunk_count=count)
         return {"message": message, "filename": filename, "chunks_indexed": count}
     finally:
         delete_temp_pdf(file_path)
@@ -58,6 +60,7 @@ def ingest_text(title: str, text: str) -> dict:
     document = Document(page_content=clean_text)
     count = _ingest_documents([document], source=clean_title, doc_type="text")
 
+    record_material(source=clean_title, type="text", title=clean_title, chunk_count=count)
     return {
         "message": "Texto indexado com sucesso.",
         "source": clean_title,

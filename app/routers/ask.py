@@ -17,13 +17,16 @@ class HistoryMessage(BaseModel):
 class AskRequest(BaseModel):
     question: str = Field(..., min_length=1)
     history: list[HistoryMessage] = Field(default_factory=list)
+    conversation_id: str | None = None
 
 
 @router.post("/ask")
 async def ask(payload: AskRequest):
     history = [message.model_dump() for message in payload.history]
     try:
-        result = ask_question(payload.question, history)
+        result = ask_question(
+            payload.question, history, conversation_id=payload.conversation_id
+        )
     except ProviderConfigError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except ProviderRequestError as exc:
