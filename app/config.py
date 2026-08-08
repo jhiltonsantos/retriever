@@ -26,17 +26,12 @@ RETRIEVER_K = 4
 MAX_RETRIEVAL_LOOPS = int(os.getenv("MAX_RETRIEVAL_LOOPS", "2"))
 EVALUATOR_MIN_SCORE = float(os.getenv("EVALUATOR_MIN_SCORE", "0.6"))
 MAX_HISTORY_MESSAGES = int(os.getenv("MAX_HISTORY_MESSAGES", "10"))
+GRAPH_MUTUAL_KNN_K = int(os.getenv("GRAPH_MUTUAL_KNN_K", "3"))
 
 API_PORT = int(os.getenv("API_PORT", "8000"))
 IS_DESKTOP = os.getenv("DESKTOP_MODE", "0") == "1"
 
-CORS_ORIGINS = (
-    ["*"]
-    if IS_DESKTOP
-    else [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:4173",
-        "http://127.0.0.1:4173",
-    ]
-)
+CORS_ORIGINS = ["*"] if IS_DESKTOP else []
+# Vite pula para a proxima porta livre (5174, 5175...) quando 5173 esta ocupada
+# -- por regex em vez de lista fixa, para nao quebrar sempre que isso acontecer.
+CORS_ORIGIN_REGEX = None if IS_DESKTOP else r"^https?://(localhost|127\.0\.0\.1):\d+$"

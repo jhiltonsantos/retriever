@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from app.db import get_connection
+from app.dependencies import get_vectorstore
 
 
 def list_materials() -> list[dict]:
@@ -32,5 +33,14 @@ def record_material(source: str, type: str, title: str, chunk_count: int) -> dic
 
 def delete_material(material_id: str) -> bool:
     with get_connection() as conn:
+        row = conn.execute(
+            "SELECT source FROM materials WHERE id = ?", (material_id,)
+        ).fetchone()
+        if row is None:
+            return False
         cursor = conn.execute("DELETE FROM materials WHERE id = ?", (material_id,))
+
+    # Sem isso, o material some do catalogo mas os chunks continuam no Chroma
+    # e o tutor segue citando um documento que o usuario acabou de excluir.
+    get_vectorstore().delete(where={"source": row["source"]})
     return cursor.rowcount > 0
