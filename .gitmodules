@@ -1,0 +1,6 @@
+[submodule "packages/retriever-api"]
+	path = packages/retriever-api
+	url = https://github.com/jhiltonsantos/retriever-api.git
+[submodule "packages/retriever-web"]
+	path = packages/retriever-web
+	url = https://github.com/jhiltonsantos/retriever-web.git
