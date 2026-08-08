@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Form, HTTPException
+from typing import Literal
+
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel, Field
 
 from app.providers.base import ProviderConfigError, ProviderRequestError
 from app.services.rag import ask_question
@@ -6,10 +9,21 @@ from app.services.rag import ask_question
 router = APIRouter(tags=["ask"])
 
 
+class HistoryMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+
+
+class AskRequest(BaseModel):
+    question: str = Field(..., min_length=1)
+    history: list[HistoryMessage] = Field(default_factory=list)
+
+
 @router.post("/ask")
-async def ask(question: str = Form(...)):
+async def ask(payload: AskRequest):
+    history = [message.model_dump() for message in payload.history]
     try:
-        answer = ask_question(question)
+        result = ask_question(payload.question, history)
     except ProviderConfigError as exc:
         raise HTTPException(status_code=409, detail=str(exc)) from exc
     except ProviderRequestError as exc:
@@ -25,4 +39,9 @@ async def ask(question: str = Form(...)):
             detail="Não foi possível conectar aos modelos em localhost:11434.",
         ) from exc
 
-    return {"answer": answer}
+    response = {"answer": result["answer"]}
+    if result["sources"]:
+        response["sources"] = result["sources"]
+    if result["agent_steps"]:
+        response["agent_steps"] = result["agent_steps"]
+    return response

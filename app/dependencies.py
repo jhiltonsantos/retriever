@@ -1,17 +1,15 @@
 from langchain_chroma import Chroma
-from langchain_classic.chains import create_retrieval_chain
-from langchain_classic.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_ollama import OllamaEmbeddings
 
-from app.config import CHROMA_DIR, EMBED_MODEL, OLLAMA_BASE_URL, RETRIEVER_K
-from app.prompts.tutor import tutor_prompt
+from app.config import CHROMA_DIR, EMBED_MODEL, OLLAMA_BASE_URL
 from app.providers.registry import get_provider
+from app.settings_store import get_effective_config
 
 _embeddings = None
 _vectorstore = None
 _llm = None
-_retrieval_chain = None
+_agent_graph = None
 
 
 def get_embeddings() -> OllamaEmbeddings:
@@ -38,17 +36,22 @@ def get_vectorstore() -> Chroma:
 def get_llm() -> BaseChatModel:
     global _llm
     if _llm is None:
-        _llm = get_provider().build_llm()
+        cfg = get_effective_config()
+        _llm = get_provider(cfg.provider).build_llm(
+            model=cfg.model, base_url=cfg.base_url, api_key=cfg.api_key
+        )
     return _llm
 
 
-def get_retrieval_chain():
-    global _retrieval_chain
-    if _retrieval_chain is None:
-        llm = get_llm()
-        retriever = get_vectorstore().as_retriever(
-            search_kwargs={"k": RETRIEVER_K},
-        )
-        combine_docs_chain = create_stuff_documents_chain(llm, tutor_prompt)
-        _retrieval_chain = create_retrieval_chain(retriever, combine_docs_chain)
-    return _retrieval_chain
+def get_agent_graph():
+    global _agent_graph
+    if _agent_graph is None:
+        from app.graph.rag_agent import build_graph
+
+        _agent_graph = build_graph().compile()
+    return _agent_graph
+
+
+def reset_llm_cache() -> None:
+    global _llm
+    _llm = None

@@ -1,7 +1,7 @@
-from app.config import LLM_PROVIDER
 from app.providers.base import LlmProvider
 from app.providers.ollama import OllamaProvider
 from app.providers.openrouter import OpenRouterProvider
+from app.settings_store import get_effective_config
 
 _PROVIDERS: dict[str, LlmProvider] = {
     "ollama": OllamaProvider(),
@@ -9,15 +9,18 @@ _PROVIDERS: dict[str, LlmProvider] = {
 }
 
 
-def get_provider() -> LlmProvider:
+def get_provider(name: str) -> LlmProvider:
     try:
-        return _PROVIDERS[LLM_PROVIDER]
+        return _PROVIDERS[name]
     except KeyError:
         raise ValueError(
-            f"LLM_PROVIDER invalido: {LLM_PROVIDER!r}. "
-            f"Use um destes: {', '.join(_PROVIDERS)}."
+            f"LLM_PROVIDER invalido: {name!r}. Use um destes: {', '.join(_PROVIDERS)}."
         ) from None
 
 
+def get_current_provider() -> LlmProvider:
+    return get_provider(get_effective_config().provider)
+
+
 def normalize_error(exc: Exception) -> Exception:
-    return get_provider().normalize_error(exc)
+    return get_current_provider().normalize_error(exc)

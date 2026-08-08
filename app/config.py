@@ -17,10 +17,15 @@ LLM_API_BASE_URL = os.getenv("LLM_API_BASE_URL", "https://openrouter.ai/api/v1")
 
 CHROMA_DIR = Path(os.getenv("CHROMA_DIR", BASE_DIR / "chroma_data"))
 TMP_UPLOAD_DIR = Path(os.getenv("TMP_UPLOAD_DIR", BASE_DIR / "tmp_uploads"))
+SETTINGS_DIR = Path(os.getenv("SETTINGS_DIR", BASE_DIR / "user_data"))
 
 CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 200
 RETRIEVER_K = 4
+
+MAX_RETRIEVAL_LOOPS = int(os.getenv("MAX_RETRIEVAL_LOOPS", "2"))
+EVALUATOR_MIN_SCORE = float(os.getenv("EVALUATOR_MIN_SCORE", "0.6"))
+MAX_HISTORY_MESSAGES = int(os.getenv("MAX_HISTORY_MESSAGES", "10"))
 
 API_PORT = int(os.getenv("API_PORT", "8000"))
 IS_DESKTOP = os.getenv("DESKTOP_MODE", "0") == "1"
