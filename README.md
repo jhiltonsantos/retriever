@@ -24,9 +24,9 @@ Retriever is a study and content creation assistant that uses Agentic RAG archit
 
 ### Prerequisites
 
-- **Python 3.11+** (for the backend)
-- **Node.js 20+** (for the frontend)
-- **Ollama** installed and running ([download here](https://ollama.com/download))
+- **Ollama** installed and running ([download here](https://ollama.com/download)) — required either way, embeddings always run locally
+- **Python 3.11+** and **Node.js 20+** for the manual setup, **or**
+- **Docker** and **Docker Compose** ([get Docker](https://docs.docker.com/get-docker/)) for the containerized setup
 
 ### 1. Clone the repository
 
@@ -63,7 +63,26 @@ Verify Ollama is running:
 curl http://localhost:11434/api/tags
 ```
 
-### 3. Start the backend
+### 3. Start the app
+
+Pick one of the two paths below.
+
+#### Option A: Docker Compose (single command)
+
+```bash
+docker compose up --build
+```
+
+- Frontend: [http://localhost:5173](http://localhost:5173)
+- Backend: [http://localhost:8000](http://localhost:8000)
+- Both containers hot-reload on source changes (bind-mounted) — no rebuild needed while editing.
+- Ollama keeps running on the host; the API container reaches it automatically.
+- Configure your LLM provider (Ollama or OpenRouter) from the app's **Settings** screen after it's running — saved settings persist in SQLite across restarts. Optionally, `cp .env.example .env` and fill in `LLM_API_KEY` beforehand if you'd rather pre-seed the default provider via env vars instead.
+- Stop with `docker compose down` (add `-v` only if you also want to drop any named volumes — this setup doesn't create any, your data lives in the bind-mounted package folders).
+
+#### Option B: Manual (Python + Node)
+
+**Start the backend**
 
 ```bash
 cd packages/retriever-api
@@ -92,7 +111,7 @@ uvicorn main:app --reload --host 127.0.0.1 --port 8000
 
 Interactive API docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-### 4. Start the frontend (in another terminal)
+**Start the frontend (in another terminal)**
 
 ```bash
 cd packages/retriever-web
@@ -102,7 +121,7 @@ npm run dev
 
 Open [http://localhost:5173](http://localhost:5173)
 
-### 5. Verify it's working
+### 4. Verify it's working
 
 1. Go to **Index materials** tab, upload a PDF or paste text — confirm `chunks_indexed` > 0
 2. Go to **Chat** and ask something about your indexed material — the answer should cite sources
