@@ -70,7 +70,6 @@ Pick one of the two paths below.
 #### Option A: Docker Compose (single command)
 
 ```bash
-cp .env.example .env   # then edit LLM_API_KEY if using openrouter
 docker compose up --build
 ```
 
@@ -78,6 +77,7 @@ docker compose up --build
 - Backend: [http://localhost:8000](http://localhost:8000)
 - Both containers hot-reload on source changes (bind-mounted) — no rebuild needed while editing.
 - Ollama keeps running on the host; the API container reaches it automatically.
+- Configure your LLM provider (Ollama or OpenRouter) from the app's **Settings** screen after it's running — saved settings persist in SQLite across restarts. Optionally, `cp .env.example .env` and fill in `LLM_API_KEY` beforehand if you'd rather pre-seed the default provider via env vars instead.
 - Stop with `docker compose down` (add `-v` only if you also want to drop any named volumes — this setup doesn't create any, your data lives in the bind-mounted package folders).
 
 #### Option B: Manual (Python + Node)
