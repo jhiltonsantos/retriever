@@ -22,12 +22,6 @@
 	let visible = $state(false);
 
 	onMount(async () => {
-		if (window.retriever?.checkOllama) {
-			const ok = await window.retriever.checkOllama();
-			visible = !ok;
-			return;
-		}
-
 		try {
 			const res = await fetch('http://localhost:11434/api/tags');
 			visible = !res.ok;
