@@ -9,3 +9,6 @@
 !/binaries/.gitkeep
 
 node_modules
+
+build/
+dist/
