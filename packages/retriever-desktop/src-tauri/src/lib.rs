@@ -1,6 +1,7 @@
 use std::sync::Mutex;
 use std::time::Duration;
 
+use tauri::image::Image;
 use tauri::Manager;
 use tauri_plugin_shell::process::{CommandChild, CommandEvent};
 use tauri_plugin_shell::ShellExt;
@@ -13,7 +14,22 @@ struct ApiProcess(Mutex<Option<CommandChild>>);
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+  // Must run before GTK/the windowing system initializes. The compiled
+  // binary is named "retriever" (see Cargo.toml [package].name, which the
+  // bundler also uses for the AppImage's .desktop Icon=/StartupWMClass=),
+  // so this keeps the live window's WM_CLASS consistent with that — GTK's
+  // default WM_CLASS otherwise falls back to argv[0]'s basename.
+  #[cfg(target_os = "linux")]
+  glib::set_prgname(Some("retriever"));
+
   tauri::Builder::default()
+    .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+      if let Some(window) = app.get_webview_window("main") {
+        let _ = window.show();
+        let _ = window.set_focus();
+        let _ = window.unminimize();
+      }
+    }))
     .plugin(tauri_plugin_shell::init())
     .manage(ApiProcess(Mutex::new(None)))
     .setup(|app| {
@@ -84,6 +100,26 @@ fn wait_for_api_then_show_main(app: tauri::AppHandle) {
       let _ = splash.close();
     }
     if let Some(main) = app.get_webview_window("main") {
+      // Set explicitly instead of relying on the AppImage's .desktop Icon=
+      // lookup, which only resolves once the AppImage is "installed" into
+      // the system (copied into an XDG icon theme dir) — an unintegrated
+      // AppImage has no such entry, so GNOME/most WMs fall back to a
+      // generic icon. Setting it on the live window also updates the
+      // window's _NET_WM_ICON property directly, which WMs use as a
+      // fallback when there's no matching desktop-file icon.
+      //
+      // Done here (after the event loop is already pumping), not in
+      // `setup()` — `set_icon()` dispatches through a channel that's only
+      // drained once the event loop runs, so calling it synchronously
+      // inside `setup()` (which runs before the event loop starts)
+      // deadlocks the whole app before `start_api_process()` ever runs.
+      match Image::from_bytes(include_bytes!("../icons/128x128.png")) {
+        Ok(icon) => {
+          let _ = main.set_icon(icon);
+        }
+        Err(err) => log::error!("Failed to decode the bundled app icon: {err}"),
+      }
+
       let _ = main.show();
       let _ = main.set_focus();
     }
