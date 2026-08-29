@@ -31,6 +31,9 @@ pyinstaller --onefile --name retriever-api \
     --hidden-import langchain_ollama \
     --hidden-import langchain_chroma \
     --hidden-import chromadb \
+    --hidden-import chromadb_rust_bindings \
+    --collect-submodules chromadb \
+    --collect-data chromadb \
     --hidden-import pypdf \
     desktop_entry.py
 
