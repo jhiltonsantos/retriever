@@ -1,10 +1,13 @@
 use std::sync::Mutex;
+use std::time::Duration;
 
 use tauri::Manager;
 use tauri_plugin_shell::process::{CommandChild, CommandEvent};
 use tauri_plugin_shell::ShellExt;
 
 const DESKTOP_API_PORT: &str = "18765";
+const HEALTH_POLL_INTERVAL: Duration = Duration::from_millis(300);
+const HEALTH_POLL_TIMEOUT: Duration = Duration::from_secs(30);
 
 struct ApiProcess(Mutex<Option<CommandChild>>);
 
@@ -32,6 +35,10 @@ pub fn run() {
         }
       }
 
+      // Splash screen stays up (and the main window hidden) until the
+      // sidecar answers /health, or until the timeout below fires.
+      wait_for_api_then_show_main(app.handle().clone());
+
       Ok(())
     })
     .on_window_event(|window, event| {
@@ -45,6 +52,42 @@ pub fn run() {
     })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
+}
+
+fn wait_for_api_then_show_main(app: tauri::AppHandle) {
+  tauri::async_runtime::spawn(async move {
+    let health_url = format!("http://127.0.0.1:{DESKTOP_API_PORT}/health");
+    let client = reqwest::Client::new();
+    let deadline = tokio::time::Instant::now() + HEALTH_POLL_TIMEOUT;
+
+    loop {
+      let healthy = matches!(
+        client.get(&health_url).send().await,
+        Ok(response) if response.status().is_success()
+      );
+
+      if healthy {
+        break;
+      }
+
+      if tokio::time::Instant::now() >= deadline {
+        log::error!("Timed out waiting for the api process to become healthy, showing main window anyway");
+        break;
+      }
+
+      tokio::time::sleep(HEALTH_POLL_INTERVAL).await;
+    }
+
+    log::info!("Api healthy (or timed out), swapping splash screen for the main window");
+
+    if let Some(splash) = app.get_webview_window("splashscreen") {
+      let _ = splash.close();
+    }
+    if let Some(main) = app.get_webview_window("main") {
+      let _ = main.show();
+      let _ = main.set_focus();
+    }
+  });
 }
 
 fn start_api_process(
