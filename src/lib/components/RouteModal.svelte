@@ -1,6 +1,6 @@
 <div class="fixed inset-0 z-50 flex items-center justify-center p-8">
 	<div
-		class="absolute inset-0 bg-[var(--color-on-surface)]/40 backdrop-blur-sm"
+		class="absolute inset-0 bg-[var(--color-on-surface)]/40"
 		onclick={onClose}
 		aria-hidden="true"
 	></div>
