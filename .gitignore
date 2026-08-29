@@ -7,3 +7,7 @@ node_modules/
 .svelte-kit/
 .env
 *.pyc
+
+build/
+dist/
+
