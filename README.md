@@ -31,15 +31,11 @@ Retriever is a study and content creation assistant that uses Agentic RAG archit
 ### 1. Clone the repository
 
 ```bash
-git clone --recurse-submodules https://github.com/jhiltonsantos/retriever.git
+git clone https://github.com/jhiltonsantos/retriever.git
 cd retriever
 ```
 
-If submodules are empty:
-
-```bash
-git submodule update --init --recursive
-```
+Both packages (`retriever-api`, `retriever-web`) live directly in this repo — no submodules to initialize.
 
 ### 2. Set up Ollama (required for embeddings)
 
@@ -275,20 +271,14 @@ View the UI prototype and design system on Figma:
 
 ### Publishing changes
 
-Since this is a monorepo with submodules, publishing requires three commits:
+`retriever-api` and `retriever-web` are regular directories in this monorepo — they used to be separate submodules and were inlined with `git subtree` (full commit history preserved). Publishing a change is a single commit:
 
 ```bash
-# 1. Commit in the package
-cd packages/retriever-api
+cd packages/retriever-api   # or packages/retriever-web
 git add . && git commit -m "your message" && git push origin main
-
-# 2. Update pointer in retriever/
-cd ..
-git add packages/retriever-api && git commit -m "chore: update retriever-api" && git push origin main
-
-# 3. (If you have access to the main private repo)
-# Update pointer in retriever-principal/
 ```
+
+If you have access to the main private repo (`retriever-principal`), bump its `retriever` submodule pointer afterward.
 
 ## License
 
