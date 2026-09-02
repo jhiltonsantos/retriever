@@ -58,10 +58,6 @@
 
 	onMount(async () => {
 		try {
-			if (window.retriever?.checkOllama) {
-				online = await window.retriever.checkOllama();
-				return;
-			}
 			const res = await fetch('http://localhost:11434/api/tags');
 			online = res.ok;
 		} catch {

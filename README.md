@@ -11,7 +11,6 @@ This is the user interface for Retriever. It provides:
 - **Conversation management** with persistent history
 - **Settings panel** for LLM provider configuration
 - **Material catalog** to view and manage indexed documents
-- **Desktop app** via Electron (optional)
 
 ## Tech Stack
 
@@ -20,7 +19,6 @@ This is the user interface for Retriever. It provides:
 - **Tailwind CSS v4** — Utility-first styling
 - **daisyUI 5** — Component library
 - **TypeScript** — Type safety
-- **Electron** — Desktop wrapper (optional)
 
 ## Design
 
@@ -73,21 +71,7 @@ npm run build
 npm run preview  # Test the build locally
 ```
 
-The build output is in `build/` — a static SPA that can be deployed anywhere or wrapped in Electron.
-
-### Desktop App (Electron)
-
-```bash
-npm run dev:electron
-```
-
-This launches the Electron wrapper with the API as a subprocess.
-
-To build the Windows installer:
-
-```bash
-npm run build:desktop  # Requires Windows + PowerShell
-```
+The build output is in `build/` — a static SPA that can be deployed anywhere.
 
 ## Features
 
@@ -146,7 +130,7 @@ All routes except `/` and `/chat` open as modals over the main content.
 retriever-web/
 ├── src/
 │   ├── app.css                    # Tailwind + daisyUI + custom theme
-│   ├── app.d.ts                   # TypeScript declarations (window.retriever)
+│   ├── app.d.ts                   # TypeScript declarations
 │   ├── app.html                   # HTML template
 │   ├── lib/
 │   │   ├── api/                   # API client wrappers
@@ -199,11 +183,6 @@ retriever-web/
 │       │   └── +page.svelte       # Settings panel
 │       └── info/
 │           └── +page.svelte       # About page
-├── electron/                      # Electron wrapper
-│   ├── main.ts                    # Main process
-│   ├── preload.ts                 # Preload script (context bridge)
-│   ├── paths.ts                   # Path resolution
-│   └── api-manager.ts             # API subprocess management
 ├── static/                        # Static assets
 ├── svelte.config.js               # SvelteKit configuration
 ├── tailwind.config.js             # Tailwind configuration
@@ -224,7 +203,6 @@ The app uses `@sveltejs/adapter-static` with `fallback: 'index.html'`, producing
 
 This allows the app to be:
 - Deployed as static files
-- Wrapped in Electron without a Node server
 - Served from any static host
 
 ### DaisyUI + Tailwind
@@ -289,8 +267,6 @@ Conversation ID is in the URL: `/chat?conv={id}`
 | `npm run build` | Build for production |
 | `npm run preview` | Preview production build |
 | `npm run check` | Type check with `svelte-check` |
-| `npm run dev:electron` | Run Electron app in development |
-| `npm run build:desktop` | Build Windows installer |
 
 **Note:** `npm run check` is the only automated verification — no test suite or linter configured.
 
@@ -308,55 +284,9 @@ const response = await askQuestion(
 );
 ```
 
-The API base URL is configured in `src/lib/api/config.ts`:
+The API base URL is configured in `src/lib/api/config.ts`, using the `PUBLIC_API_URL` env var or defaulting to `http://127.0.0.1:8000`.
 
-- **Desktop (Electron)**: Uses `window.retriever.getApiUrl()`
-- **Web**: Uses `PUBLIC_API_URL` env var or defaults to `http://127.0.0.1:8000`
-
-## Desktop App (Electron)
-
-The Electron wrapper (`electron/`) provides:
-
-- **Native window** — Runs the SPA in a desktop window
-- **API subprocess** — Automatically starts the FastAPI backend
-- **Local data** — Stores database and uploads in user data directory
-- **System tray** — Optional tray icon (Windows)
-
-### Architecture
-
-```
-Electron Main Process
-├── Creates BrowserWindow
-├── Starts API subprocess (uvicorn)
-├── Waits for health check
-└── Loads SPA in window
-
-Electron Preload Script
-├── Exposes window.retriever API
-├── getApiUrl() — Returns API URL
-├── checkOllama() — Checks Ollama status
-└── isDesktop — Always true
-```
-
-### Development
-
-```bash
-npm run dev:electron
-```
-
-This:
-1. Builds the SPA
-2. Compiles Electron main/preload
-3. Starts the API subprocess
-4. Launches Electron window
-
-### Building
-
-```bash
-npm run build:desktop  # Windows only
-```
-
-Produces `Retriever Setup.exe` installer in `dist/desktop/`.
+A desktop shell (Tauri) is being rebuilt in `packages/retriever-desktop/` — see `F-DESKTOP` in the roadmap of the private `retriever-principal` repo.
 
 ## Troubleshooting
 
