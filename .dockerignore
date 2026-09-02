@@ -1,13 +1,10 @@
 .venv/
 __pycache__/
+**/__pycache__/
+*.pyc
 chroma_data/
 tmp_uploads/
 user_data/
-node_modules/
-.svelte-kit/
 .env
-*.pyc
-
-build/
-dist/
-
+.git
+README.md
