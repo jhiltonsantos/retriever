@@ -1,0 +1,29 @@
+services:
+  api:
+    build:
+      context: ./packages/retriever-api
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./packages/retriever-api:/app
+
+  web:
+    build:
+      context: ./packages/retriever-web
+    ports:
+      - "5173:5173"
+    environment:
+      - PUBLIC_API_URL=http://localhost:8000
+    volumes:
+      - ./packages/retriever-web:/app
+      - /app/node_modules
+      - /app/.svelte-kit
+    depends_on:
+      - api
