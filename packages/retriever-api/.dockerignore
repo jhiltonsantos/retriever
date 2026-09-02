@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+chroma_data/
+tmp_uploads/
+user_data/
+.env
+.git
+README.md
