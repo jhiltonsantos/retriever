@@ -1,11 +1,6 @@
 node_modules/
 .svelte-kit/
 build/
-dist-electron/
-electron/
-electron-builder.yml
-resources/
-scripts/build-electron.mjs
 .env
 .env.*
 !.env.example

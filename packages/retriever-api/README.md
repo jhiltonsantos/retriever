@@ -330,7 +330,7 @@ API keys are **never** logged or returned in error messages.
 
 ## Desktop Mode
 
-Set `DESKTOP_MODE=1` to enable desktop CORS (allows all origins). Used by the Electron wrapper.
+Set `DESKTOP_MODE=1` to enable desktop CORS (allows all origins). Used by the Tauri shell (`retriever-desktop`), which spawns this API as a sidecar process.
 
 ## Development
 

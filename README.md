@@ -18,7 +18,8 @@ Retriever is a study and content creation assistant that uses Agentic RAG archit
 | Package | Description |
 |---------|-------------|
 | [`packages/retriever-api`](packages/retriever-api) | FastAPI backend with LangChain/LangGraph, ChromaDB, and Agentic RAG pipeline |
-| [`packages/retriever-web`](packages/retriever-web) | SvelteKit 5 frontend with chat interface and Electron desktop support |
+| [`packages/retriever-web`](packages/retriever-web) | SvelteKit 5 frontend with chat interface |
+| [`packages/retriever-desktop`](packages/retriever-desktop) | Tauri desktop shell, spawns the backend as a sidecar |
 
 ## Quick Start
 
@@ -147,7 +148,7 @@ Open [http://localhost:5173](http://localhost:5173)
 
 ```
 ┌─────────────────┐
-│  retriever-web  │  SvelteKit SPA + Electron
+│  retriever-web  │  SvelteKit SPA (loaded by retriever-desktop when packaged)
 │   (Frontend)    │
 └────────┬────────┘
          │ HTTP
@@ -252,7 +253,7 @@ Agentic RAG solves these by:
 - **Multiple LLM providers**: Switch between Ollama (local) and OpenRouter (remote) via UI
 - **Persistent conversations**: Chat history stored in SQLite, multiple conversations supported
 - **Material catalog**: Track all indexed documents with metadata
-- **Desktop app**: Optional Electron wrapper for native experience (Windows installer available)
+- **Desktop app**: Optional Tauri shell for a native experience (AppImage available on Linux; Windows/macOS pending)
 
 ## Documentation
 
