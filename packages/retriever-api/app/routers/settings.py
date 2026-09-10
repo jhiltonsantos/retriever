@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 from app.providers.base import ProviderConfigError, ProviderRequestError
 from app.services import settings as settings_service
+from app.settings_store import KeyringUnavailableError
 
 router = APIRouter(prefix="/settings", tags=["settings"])
 
@@ -16,7 +17,13 @@ class LlmSettingsPayload(BaseModel):
 
 @router.get("/llm")
 async def get_llm_settings():
-    return settings_service.get_llm_settings()
+    try:
+        return settings_service.get_llm_settings()
+    except KeyringUnavailableError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Nao foi possivel acessar o keyring do sistema para ler a chave de API.",
+        ) from exc
 
 
 @router.put("/llm")
@@ -25,6 +32,11 @@ async def update_llm_settings(payload: LlmSettingsPayload):
         return settings_service.update_llm_settings(payload)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except KeyringUnavailableError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Nao foi possivel acessar o keyring do sistema para gravar a chave de API.",
+        ) from exc
 
 
 @router.get("/llm/models")
@@ -47,6 +59,11 @@ async def get_llm_models(provider: str | None = None):
             status_code=503,
             detail="Não foi possível conectar aos modelos em localhost:11434.",
         ) from exc
+    except KeyringUnavailableError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Nao foi possivel acessar o keyring do sistema para ler a chave de API.",
+        ) from exc
 
 
 @router.post("/llm/test")
@@ -55,3 +72,8 @@ async def test_llm_connection(payload: LlmSettingsPayload):
         return settings_service.test_llm_connection(payload)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except KeyringUnavailableError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail="Nao foi possivel acessar o keyring do sistema para ler a chave de API.",
+        ) from exc

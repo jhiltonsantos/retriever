@@ -35,6 +35,8 @@ pyinstaller --onefile --name retriever-api \
     --collect-submodules chromadb \
     --collect-data chromadb \
     --hidden-import pypdf \
+    --collect-submodules keyring.backends \
+    --copy-metadata keyring \
     desktop_entry.py
 
 TARGET_TRIPLE="$(rustc --print host-tuple)"

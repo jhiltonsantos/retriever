@@ -132,8 +132,10 @@ fn start_api_process(
   let app_data_dir = app.path().app_data_dir()?;
   let chroma_dir = app_data_dir.join("chroma_data");
   let tmp_upload_dir = app_data_dir.join("tmp_uploads");
+  let settings_dir = app_data_dir.join("user_data");
   std::fs::create_dir_all(&chroma_dir)?;
   std::fs::create_dir_all(&tmp_upload_dir)?;
+  std::fs::create_dir_all(&settings_dir)?;
 
   let sidecar = app
     .shell()
@@ -141,7 +143,8 @@ fn start_api_process(
     .env("API_PORT", DESKTOP_API_PORT)
     .env("DESKTOP_MODE", "1")
     .env("CHROMA_DIR", chroma_dir.to_string_lossy().to_string())
-    .env("TMP_UPLOAD_DIR", tmp_upload_dir.to_string_lossy().to_string());
+    .env("TMP_UPLOAD_DIR", tmp_upload_dir.to_string_lossy().to_string())
+    .env("SETTINGS_DIR", settings_dir.to_string_lossy().to_string());
 
   let (mut rx, child) = sidecar.spawn()?;
 

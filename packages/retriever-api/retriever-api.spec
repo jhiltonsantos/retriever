@@ -1,11 +1,14 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_data_files
 from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import copy_metadata
 
 datas = []
 hiddenimports = ['uvicorn.logging', 'uvicorn.loops', 'uvicorn.loops.auto', 'uvicorn.protocols', 'uvicorn.protocols.http', 'uvicorn.protocols.http.auto', 'uvicorn.protocols.websockets', 'uvicorn.protocols.websockets.auto', 'uvicorn.lifespan', 'uvicorn.lifespan.on', 'langchain_classic', 'langchain_community', 'langchain_ollama', 'langchain_chroma', 'chromadb', 'chromadb_rust_bindings', 'pypdf']
 datas += collect_data_files('chromadb')
+datas += copy_metadata('keyring')
 hiddenimports += collect_submodules('chromadb')
+hiddenimports += collect_submodules('keyring.backends')
 
 
 a = Analysis(
