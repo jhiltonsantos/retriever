@@ -12,6 +12,7 @@
     "windows": [
       {
         "label": "main",
+        "url": "/",
         "title": "Retriever",
         "width": 1100,
         "height": 800,
