@@ -1,11 +1,20 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-from app.config import LLM_API_KEY, LLM_PROVIDER, OLLAMA_BASE_URL
+import keyring
+import keyring.errors
+
+from app.config import IS_DESKTOP, LLM_API_KEY, LLM_PROVIDER, OLLAMA_BASE_URL
 from app.db import get_connection
 
 OPENROUTER_DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 _ALL_PROVIDERS = ("ollama", "openrouter", "custom")
+_KEYRING_SERVICE = "retriever-desktop"
+
+
+class KeyringUnavailableError(RuntimeError):
+    """IS_DESKTOP=True mas o keyring do sistema operacional nao pode ser
+    acessado (Secret Service/D-Bus ausente, keychain bloqueado, etc.)."""
 
 
 def default_base_url(provider: str) -> str:
@@ -14,6 +23,29 @@ def default_base_url(provider: str) -> str:
     if provider == "openrouter":
         return OPENROUTER_DEFAULT_BASE_URL
     return ""  # "custom" nao tem default sensato
+
+
+def _get_secret(provider: str) -> str | None:
+    try:
+        return keyring.get_password(_KEYRING_SERVICE, provider)
+    except keyring.errors.KeyringError as exc:
+        raise KeyringUnavailableError(
+            "Nao foi possivel acessar o keyring do sistema para ler a chave de API."
+        ) from exc
+
+
+def _set_secret(provider: str, value: str | None) -> None:
+    try:
+        if value:
+            keyring.set_password(_KEYRING_SERVICE, provider, value)
+        else:
+            keyring.delete_password(_KEYRING_SERVICE, provider)
+    except keyring.errors.PasswordDeleteError:
+        pass  # nada estava salvo antes, nao ha o que apagar
+    except keyring.errors.KeyringError as exc:
+        raise KeyringUnavailableError(
+            "Nao foi possivel acessar o keyring do sistema para gravar a chave de API."
+        ) from exc
 
 
 @dataclass
@@ -54,12 +86,17 @@ def get_provider_settings(provider: str) -> EffectiveLlmConfig:
     row = _read_row(provider)
     saved = row or {}
 
-    api_key = saved.get("api_key")
-    if not api_key and row is None and provider == LLM_PROVIDER:
-        # Fallback de config zero: LLM_API_KEY so preenche o provedor default do
-        # .env, e so enquanto ele nunca foi salvo no banco (preserva deploys
-        # via env var, ex.: injecao futura de chave no desktop).
-        api_key = LLM_API_KEY or None
+    if IS_DESKTOP:
+        # No desktop empacotado o segredo nunca vive na coluna do SQLite -
+        # ver ADR-0005. A coluna api_key so e usada no ramo nao-desktop abaixo.
+        api_key = _get_secret(provider)
+    else:
+        api_key = saved.get("api_key")
+        if not api_key and row is None and provider == LLM_PROVIDER:
+            # Fallback de config zero: LLM_API_KEY so preenche o provedor default do
+            # .env, e so enquanto ele nunca foi salvo no banco (preserva deploys
+            # via env var, ex.: injecao futura de chave no desktop).
+            api_key = LLM_API_KEY or None
 
     return EffectiveLlmConfig(
         provider=provider,
@@ -79,8 +116,15 @@ def write_settings(payload: dict) -> None:
     merged = {
         "model": payload.get("model") if payload.get("model") is not None else current.get("model"),
         "base_url": payload.get("base_url") if payload.get("base_url") is not None else current.get("base_url"),
-        "api_key": payload.get("api_key") if payload.get("api_key") is not None else current.get("api_key"),
     }
+
+    if IS_DESKTOP:
+        if payload.get("api_key") is not None:
+            _set_secret(provider, payload["api_key"])
+        stored_api_key = None  # nunca grava o segredo em texto plano - ver ADR-0005
+    else:
+        stored_api_key = payload.get("api_key") if payload.get("api_key") is not None else current.get("api_key")
+
     now = datetime.now(timezone.utc).isoformat()
     with get_connection() as conn:
         conn.execute(
@@ -89,7 +133,7 @@ def write_settings(payload: dict) -> None:
                ON CONFLICT(provider) DO UPDATE SET
                  model=excluded.model, base_url=excluded.base_url,
                  api_key=excluded.api_key, updated_at=excluded.updated_at""",
-            (provider, merged["model"], merged["base_url"], merged["api_key"], now),
+            (provider, merged["model"], merged["base_url"], stored_api_key, now),
         )
     set_active_provider(provider)
 
