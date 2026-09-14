@@ -3,6 +3,9 @@ name: Release
 on:
   push:
     branches: [main]
+    paths:
+      - "CHANGELOG.md"
+      - "packages/retriever-desktop/src-tauri/tauri.conf.json"
 
 jobs:
   check-version:
