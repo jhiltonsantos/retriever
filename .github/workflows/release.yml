@@ -7,6 +7,10 @@ on:
       - "CHANGELOG.md"
       - "packages/retriever-desktop/src-tauri/tauri.conf.json"
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   check-version:
     runs-on: ubuntu-latest
@@ -51,6 +55,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: npm
+          cache-dependency-path: |
+            packages/retriever-web/package-lock.json
+            packages/retriever-desktop/package-lock.json
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -97,7 +105,8 @@ jobs:
 
       - name: Extract changelog entry
         run: |
-          awk -v ver="$VERSION" '
+          VERSION_RE=$(printf '%s' "$VERSION" | sed 's/\./\\./g')
+          awk -v ver="$VERSION_RE" '
             $0 ~ "^## \\[" ver "\\]" { flag=1; next }
             /^## \[/ { flag=0 }
             flag { print }
@@ -106,13 +115,6 @@ jobs:
             echo "::error::No CHANGELOG.md entry found for version $VERSION — add one in the same PR that bumps the version." >&2
             exit 1
           fi
-
-      - name: Create tag
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "v$VERSION"
-          git push origin "v$VERSION"
 
       - name: Create GitHub Release
         env:
@@ -126,4 +128,5 @@ jobs:
             packages/retriever-desktop/src-tauri/target/release/bundle/appimage/*.AppImage \
             --title "v$VERSION" \
             --notes-file release-notes.md \
+            --target "$GITHUB_SHA" \
             $PRERELEASE_FLAG
