@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Known limitations
 
-- **Linux and Windows only.**.
+- **Linux and Windows only.**
 - **Requires a local Ollama installation** with the `nomic-embed-text` model pulled, even when the chat LLM itself is a remote provider — embeddings always run locally.
 - **API key rotation while the app is running is not supported yet.** Changing the stored key requires restarting the app for it to take effect.
 - No auto-update mechanism; new versions must be downloaded manually from the releases page.
