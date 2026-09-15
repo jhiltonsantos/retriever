@@ -38,12 +38,19 @@ jobs:
             echo "should_release=true" >> "$GITHUB_OUTPUT"
           fi
 
-  release:
+  build:
     needs: check-version
     if: needs.check-version.outputs.should_release == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: linux-appimage
+            bundle_glob: packages/retriever-desktop/src-tauri/target/release/bundle/appimage/*.AppImage
+          - os: windows-latest
+            artifact_name: windows-installer
+            bundle_glob: packages/retriever-desktop/src-tauri/target/release/bundle/nsis/*.exe
+    runs-on: ${{ matrix.os }}
     env:
       VERSION: ${{ needs.check-version.outputs.version }}
     steps:
@@ -69,6 +76,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install Tauri Linux build dependencies
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -83,13 +91,23 @@ jobs:
             librsvg2-dev \
             patchelf
 
-      - name: Build API sidecar
+      - name: Build API sidecar (Linux)
+        if: matrix.os == 'ubuntu-latest'
         working-directory: packages/retriever-api
         run: |
           python -m venv .venv
           source .venv/bin/activate
           pip install -r requirements.txt
           ./scripts/build-desktop-api-linux.sh
+
+      - name: Build API sidecar (Windows)
+        if: matrix.os == 'windows-latest'
+        working-directory: packages/retriever-api
+        run: |
+          python -m venv .venv
+          & ".venv\Scripts\Activate.ps1"
+          pip install -r requirements.txt
+          & "./scripts/build-desktop-api-windows.ps1"
 
       - name: Install web dependencies
         working-directory: packages/retriever-web
@@ -99,9 +117,34 @@ jobs:
         working-directory: packages/retriever-desktop
         run: npm install
 
-      - name: Build AppImage
+      - name: Build desktop bundle
         working-directory: packages/retriever-desktop
         run: npm run build
+
+      - name: Upload bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.bundle_glob }}
+          if-no-files-found: error
+
+  publish:
+    needs: [check-version, build]
+    if: needs.check-version.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.check-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist-artifacts
 
       - name: Extract changelog entry
         run: |
@@ -125,7 +168,8 @@ jobs:
             PRERELEASE_FLAG="--prerelease"
           fi
           gh release create "v$VERSION" \
-            packages/retriever-desktop/src-tauri/target/release/bundle/appimage/*.AppImage \
+            dist-artifacts/linux-appimage/*.AppImage \
+            dist-artifacts/windows-installer/*.exe \
             --title "v$VERSION" \
             --notes-file release-notes.md \
             --target "$GITHUB_SHA" \
