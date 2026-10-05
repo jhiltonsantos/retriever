@@ -51,8 +51,10 @@ jobs:
             artifact_name: windows-installer
             bundle_glob: packages/retriever-desktop/src-tauri/target/release/bundle/nsis/*.exe
     runs-on: ${{ matrix.os }}
+    environment: release-signing
     env:
       VERSION: ${{ needs.check-version.outputs.version }}
+      SIGN_WINDOWS: ${{ matrix.os == 'windows-latest' && vars.SIGNPATH_ENABLED == 'true' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -118,14 +120,129 @@ jobs:
         run: npm install
 
       - name: Build desktop bundle
+        if: env.SIGN_WINDOWS != 'true'
         working-directory: packages/retriever-desktop
         run: npm run build
 
       - name: Upload bundle artifact
+        if: env.SIGN_WINDOWS != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.bundle_glob }}
+          if-no-files-found: error
+
+      # Windows with SignPath (ADR-0009): sign executables, bundle, sign installer.
+      - name: Build desktop app without bundling (Windows, signed)
+        if: env.SIGN_WINDOWS == 'true'
+        working-directory: packages/retriever-desktop
+        run: npm run build -- --no-bundle
+
+      - name: Stage executables for signing (Windows)
+        if: env.SIGN_WINDOWS == 'true'
+        run: |
+          $triple = (rustc --print host-tuple).Trim()
+          $sidecar = "retriever-api-$triple.exe"
+          $tauri = "packages/retriever-desktop/src-tauri"
+          foreach ($f in @("$tauri/target/release/retriever.exe", "$tauri/binaries/$sidecar")) {
+            if (-not (Test-Path $f)) { throw "Missing executable to sign: $f" }
+          }
+          New-Item -ItemType Directory -Force -Path unsigned-binaries | Out-Null
+          Copy-Item "$tauri/target/release/retriever.exe" unsigned-binaries/
+          Copy-Item "$tauri/binaries/$sidecar" unsigned-binaries/
+          Add-Content -Path $env:GITHUB_ENV -Value "SIDECAR_FILE=$sidecar"
+
+      - name: Upload unsigned executables
+        id: upload-binaries
+        if: env.SIGN_WINDOWS == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-binaries-unsigned
+          path: unsigned-binaries/*
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Sign executables (SignPath)
+        if: env.SIGN_WINDOWS == 'true'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: windows-binaries
+          github-artifact-id: ${{ steps.upload-binaries.outputs.artifact-id }}
+          wait-for-completion-timeout-in-seconds: "7200"
+          output-artifact-directory: signed-binaries
+
+      - name: Replace executables with signed copies (Windows)
+        if: env.SIGN_WINDOWS == 'true'
+        run: |
+          $tauri = "packages/retriever-desktop/src-tauri"
+          $exe = Get-ChildItem signed-binaries -Recurse -Filter retriever.exe | Select-Object -First 1
+          $side = Get-ChildItem signed-binaries -Recurse -Filter $env:SIDECAR_FILE | Select-Object -First 1
+          if (-not $exe -or -not $side) { throw "Signed executables not found in signed-binaries" }
+          $targets = @("$tauri/target/release/retriever.exe", "$tauri/binaries/$env:SIDECAR_FILE")
+          Copy-Item $exe.FullName $targets[0] -Force
+          Copy-Item $side.FullName $targets[1] -Force
+          $staged = "$tauri/target/release/retriever-api.exe"
+          if (Test-Path $staged) {
+            Copy-Item $side.FullName $staged -Force
+            $targets += $staged
+          }
+          foreach ($f in $targets) {
+            $sig = Get-AuthenticodeSignature $f
+            if ($sig.Status -ne 'Valid' -or $sig.SignerCertificate.Subject -notmatch 'SignPath') {
+              throw "Unexpected signature on ${f}: $($sig.Status)"
+            }
+          }
+
+      - name: Bundle installer (Windows, signed)
+        if: env.SIGN_WINDOWS == 'true'
+        working-directory: packages/retriever-desktop
+        run: npm run tauri -- bundle
+
+      - name: Upload unsigned installer
+        id: upload-installer
+        if: env.SIGN_WINDOWS == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer-unsigned
+          path: ${{ matrix.bundle_glob }}
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Sign installer (SignPath)
+        if: env.SIGN_WINDOWS == 'true'
+        uses: signpath/github-action-submit-signing-request@v3
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: windows-installer
+          github-artifact-id: ${{ steps.upload-installer.outputs.artifact-id }}
+          wait-for-completion-timeout-in-seconds: "7200"
+          output-artifact-directory: signed-installer
+
+      - name: Verify signed installer (Windows)
+        if: env.SIGN_WINDOWS == 'true'
+        run: |
+          $installer = Get-ChildItem signed-installer -Recurse -Filter *.exe
+          if (-not $installer) { throw "Signed installer not found in signed-installer" }
+          foreach ($f in $installer) {
+            $sig = Get-AuthenticodeSignature $f.FullName
+            if ($sig.Status -ne 'Valid' -or $sig.SignerCertificate.Subject -notmatch 'SignPath') {
+              throw "Unexpected signature on $($f.Name): $($sig.Status)"
+            }
+          }
+
+      - name: Upload signed installer
+        if: env.SIGN_WINDOWS == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: signed-installer/**/*.exe
           if-no-files-found: error
 
   publish:
