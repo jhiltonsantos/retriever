@@ -1,32 +1,34 @@
-{#if visible}
+{#if embeddings.loaded && embeddings.status !== 'ready'}
 	<div
 		role="status"
 		class="mx-8 mb-2 flex shrink-0 items-center gap-2 rounded-full bg-[var(--color-warning)]/10 px-4 py-2 text-xs text-[var(--color-warning)]"
 	>
 		<TriangleAlert size={14} class="shrink-0" />
-		<span>
-			Ollama não detectado. Instale o
-			<a class="link" href="https://ollama.com/download" target="_blank" rel="noreferrer">
-				Ollama
-			</a>
-			e baixe os modelos <code class="text-xs">llama3</code> e
-			<code class="text-xs">nomic-embed-text</code>.
-		</span>
+		{#if embeddings.status === 'model_missing'}
+			<span>
+				Ollama detectado, mas falta o modelo de embeddings. Rode
+				<code class="text-xs">ollama pull nomic-embed-text</code> e valide em Configurações.
+			</span>
+		{:else}
+			<span>
+				Ollama não detectado. Instale o
+				<a class="link" href={OLLAMA_DOWNLOAD_URL} onclick={externalLinkHandler(OLLAMA_DOWNLOAD_URL)}>
+					Ollama
+				</a>
+				e baixe o modelo <code class="text-xs">nomic-embed-text</code>.
+			</span>
+		{/if}
 	</div>
 {/if}
 
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { TriangleAlert } from '@lucide/svelte';
+	import { getEmbeddingsState, watchEmbeddingsStatus } from '$lib/embeddings-status.svelte';
+	import { externalLinkHandler } from '$lib/external-link';
 
-	let visible = $state(false);
+	const OLLAMA_DOWNLOAD_URL = 'https://ollama.com/download';
+	const embeddings = getEmbeddingsState();
 
-	onMount(async () => {
-		try {
-			const res = await fetch('http://localhost:11434/api/tags');
-			visible = !res.ok;
-		} catch {
-			visible = true;
-		}
-	});
+	onMount(watchEmbeddingsStatus);
 </script>

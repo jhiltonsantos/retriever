@@ -26,9 +26,8 @@
 		<p>
 			Documentação completa está disponível no repositório:
 			<a
-				href="https://github.com/jhiltonsantos/retriever"
-				target="_blank"
-				rel="noopener noreferrer"
+				href={REPO_URL}
+				onclick={externalLinkHandler(REPO_URL)}
 				class="text-[var(--color-primary)] underline"
 			>
 				github.com/jhiltonsantos/retriever
@@ -40,4 +39,7 @@
 
 <script lang="ts">
 	import { Info } from '@lucide/svelte';
+	import { externalLinkHandler } from '$lib/external-link';
+
+	const REPO_URL = 'https://github.com/jhiltonsantos/retriever';
 </script>

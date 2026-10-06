@@ -28,42 +28,75 @@
 		<dd><code class="text-sm">nomic-embed-text</code></dd>
 		<dt class="text-[var(--color-outline)]">Status</dt>
 		<dd>
-			{#if checking}
+			{#if embeddings.checking && !embeddings.loaded}
 				<span class="loading loading-spinner loading-xs"></span>
-			{:else if online}
+			{:else if embeddings.status === 'ready'}
 				<span class="badge badge-success p-2 badge-sm">Conectado</span>
+			{:else if embeddings.status === 'model_missing'}
+				<span class="badge badge-warning p-2 badge-sm">Modelo ausente</span>
 			{:else}
 				<span class="badge badge-error p-2 badge-sm">Indisponível</span>
 			{/if}
 		</dd>
 	</dl>
+
+	{#if embeddings.status !== 'ready'}
+		<div class="flex flex-col gap-3 rounded-2xl bg-[var(--color-surface-container)] p-4 text-sm">
+			<p class="m-0 font-semibold text-[var(--color-on-surface)]">Como configurar</p>
+			<ol class="m-0 flex list-decimal flex-col gap-2 pl-5 text-[var(--color-on-surface-variant)]">
+				<li>
+					Instale o
+					<a class="link" href={OLLAMA_DOWNLOAD_URL} onclick={externalLinkHandler(OLLAMA_DOWNLOAD_URL)}>
+						Ollama
+					</a>
+					e deixe-o em execução.
+				</li>
+				<li>
+					No terminal, baixe o modelo:
+					<code class="text-sm">ollama pull nomic-embed-text</code>
+				</li>
+				<li>Clique em Validar para o Retriever conferir.</li>
+			</ol>
+		</div>
+	{/if}
+
+	<div>
+		<button
+			type="button"
+			class="btn btn-outline btn-sm rounded-full"
+			disabled={embeddings.checking}
+			onclick={() => void refreshEmbeddingsStatus()}
+		>
+			{#if embeddings.checking}
+				<span class="loading loading-spinner loading-xs"></span>
+			{/if}
+			Validar
+		</button>
+	</div>
 </section>
 
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { Layers, Info } from '@lucide/svelte';
 	import { showAlert } from '$lib/alerts.svelte';
+	import {
+		getEmbeddingsState,
+		refreshEmbeddingsStatus,
+		watchEmbeddingsStatus
+	} from '$lib/embeddings-status.svelte';
+	import { externalLinkHandler } from '$lib/external-link';
 
 	const EMBEDDINGS_EXPLANATION =
 		'Embeddings sao vetores numericos que representam o significado de um trecho de texto — e o que permite o tutor "buscar" o conteudo mais relevante pra responder sua pergunta.\n\n' +
 		'Essa etapa roda sempre no Ollama local, independente do provedor de LLM escolhido em Provedores. Assim, o conteudo que voce indexa (PDFs, textos) nunca sai da sua maquina.\n\n' +
 		'O modelo usado e o "nomic-embed-text". Trocar de modelo de embeddings exigiria reindexar tudo (vetores de modelos diferentes nao sao compativeis entre si), por isso essa opcao nao e configuravel.';
 
-	let checking = $state(true);
-	let online = $state(false);
+	const OLLAMA_DOWNLOAD_URL = 'https://ollama.com/download';
+	const embeddings = getEmbeddingsState();
 
 	async function onInfoClick() {
 		await showAlert(EMBEDDINGS_EXPLANATION, { title: 'Embeddings' });
 	}
 
-	onMount(async () => {
-		try {
-			const res = await fetch('http://localhost:11434/api/tags');
-			online = res.ok;
-		} catch {
-			online = false;
-		} finally {
-			checking = false;
-		}
-	});
+	onMount(watchEmbeddingsStatus);
 </script>

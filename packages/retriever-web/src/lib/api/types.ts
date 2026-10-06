@@ -130,3 +130,11 @@ export type MaterialsGraphResponse = {
 	nodes: MaterialGraphNode[];
 	edges: GraphEdge[];
 };
+
+export type EmbeddingsStatus = 'ready' | 'model_missing' | 'unreachable';
+
+export type EmbeddingsStatusResponse = {
+	status: EmbeddingsStatus;
+	model: string;
+	base_url: string;
+};
