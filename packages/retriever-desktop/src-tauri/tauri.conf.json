@@ -40,6 +40,11 @@
       "csp": null
     }
   },
+  "plugins": {
+    "shell": {
+      "open": "^https://(ollama\\.com/|github\\.com/jhiltonsantos/)"
+    }
+  },
   "bundle": {
     "active": true,
     "targets": ["appimage"],
