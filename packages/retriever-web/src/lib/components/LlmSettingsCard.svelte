@@ -29,39 +29,19 @@
 	{:else}
 		<form class="flex flex-col gap-4" onsubmit={onSave}>
 			<div class=" pt-2 flex flex-row gap-x-6">
-				<label class="label cursor-pointer gap-2">
-					<input
-						type="radio"
-						name="provider"
-						class="radio radio-primary border-secondary border"
-						value="ollama"
-						checked={provider === 'ollama'}
-						onchange={() => onProviderChange('ollama')}
-					/>
-					<span class="label-text">Ollama local</span>
-				</label>
-				<label class="label cursor-pointer gap-2">
-					<input
-						type="radio"
-						name="provider"
-						class="radio radio-primary border-secondary border"
-						value="openrouter"
-						checked={provider === 'openrouter'}
-						onchange={() => onProviderChange('openrouter')}
-					/>
-					<span class="label-text">OpenRouter</span>
-				</label>
-				<label class="label cursor-pointer gap-2">
-					<input
-						type="radio"
-						name="provider"
-						class="radio radio-primary border-secondary border"
-						value="custom"
-						checked={provider === 'custom'}
-						onchange={() => onProviderChange('custom')}
-					/>
-					<span class="label-text">Custom</span>
-				</label>
+				{#each providerIds as id (id)}
+					<label class="label cursor-pointer gap-2">
+						<input
+							type="radio"
+							name="provider"
+							class="radio radio-primary border-secondary border"
+							value={id}
+							checked={provider === id}
+							onchange={() => onProviderChange(id)}
+						/>
+						<span class="label-text">{providerLabel(id)}</span>
+					</label>
+				{/each}
 			</div>
 
 			<label class="flex flex-col gap-1">
@@ -156,6 +136,7 @@
 	import { getLlmModels, getLlmSettings, testLlmConnection, updateLlmSettings } from '$lib/api/settings';
 	import type { LlmModel, LlmProviderId, LlmSettings, TestConnectionResult } from '$lib/settings/types';
 	import { showAlert } from '$lib/alerts.svelte';
+	import { providerLabel } from '$lib/settings/providers';
 
 	const LLM_PROVIDER_EXPLANATION =
 		'O "provedor" e o servico que gera as respostas do tutor.\n\n' +
@@ -176,6 +157,8 @@
 	let apiKey = $state('');
 	let apiKeyMasked = $state<string | null>(null);
 	let apiKeySet = $state(false);
+
+	const providerIds = $derived(settings ? Object.keys(settings.providers) : []);
 
 	let models = $state<LlmModel[]>([]);
 	let modelsLoading = $state(false);

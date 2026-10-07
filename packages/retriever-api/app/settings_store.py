@@ -8,7 +8,6 @@ from app.config import IS_DESKTOP, LLM_API_KEY, LLM_PROVIDER, OLLAMA_BASE_URL
 from app.db import get_connection
 
 OPENROUTER_DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
-_ALL_PROVIDERS = ("ollama", "openrouter", "custom")
 _KEYRING_SERVICE = "retriever-desktop"
 
 
@@ -139,7 +138,10 @@ def write_settings(payload: dict) -> None:
 
 
 def list_all_provider_settings() -> dict[str, EffectiveLlmConfig]:
-    return {p: get_provider_settings(p) for p in _ALL_PROVIDERS}
+    # Import tardio: o registry importa este modulo, e e ele a fonte unica dos provedores.
+    from app.providers.registry import provider_ids
+
+    return {p: get_provider_settings(p) for p in provider_ids()}
 
 
 def mask_key(key: str | None) -> str | None:

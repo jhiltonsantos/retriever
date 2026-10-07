@@ -9,6 +9,7 @@ load_dotenv(BASE_DIR / ".env")
 
 OLLAMA_BASE_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 EMBED_MODEL = os.getenv("EMBED_MODEL", "nomic-embed-text")
+EMBED_PROVIDER = os.getenv("EMBED_PROVIDER", "ollama")
 
 LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openrouter")
 LLM_MODEL = os.getenv("LLM_MODEL") or None

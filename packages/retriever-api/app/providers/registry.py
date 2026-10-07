@@ -11,6 +11,10 @@ _PROVIDERS: dict[str, LlmProvider] = {
 }
 
 
+def provider_ids() -> tuple[str, ...]:
+    return tuple(_PROVIDERS)
+
+
 def get_provider(name: str) -> LlmProvider:
     try:
         return _PROVIDERS[name]

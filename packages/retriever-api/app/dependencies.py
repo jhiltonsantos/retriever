@@ -1,8 +1,9 @@
 from langchain_chroma import Chroma
+from langchain_core.embeddings import Embeddings
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_ollama import OllamaEmbeddings
 
-from app.config import CHROMA_DIR, EMBED_MODEL, OLLAMA_BASE_URL
+from app.config import CHROMA_DIR, EMBED_MODEL, EMBED_PROVIDER, OLLAMA_BASE_URL
+from app.providers.embeddings.registry import get_embeddings_provider
 from app.providers.registry import get_provider
 from app.settings_store import get_effective_config
 
@@ -12,12 +13,11 @@ _llm = None
 _agent_graph = None
 
 
-def get_embeddings() -> OllamaEmbeddings:
+def get_embeddings() -> Embeddings:
     global _embeddings
     if _embeddings is None:
-        _embeddings = OllamaEmbeddings(
-            model=EMBED_MODEL,
-            base_url=OLLAMA_BASE_URL,
+        _embeddings = get_embeddings_provider(EMBED_PROVIDER).build(
+            model=EMBED_MODEL, base_url=OLLAMA_BASE_URL
         )
     return _embeddings
 

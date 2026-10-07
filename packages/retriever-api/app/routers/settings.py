@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from app.providers.base import ProviderConfigError, ProviderRequestError
+from app.services import embeddings_status as embeddings_status_service
 from app.services import settings as settings_service
 from app.settings_store import KeyringUnavailableError
 
@@ -37,6 +38,12 @@ async def update_llm_settings(payload: LlmSettingsPayload):
             status_code=503,
             detail="Nao foi possivel acessar o keyring do sistema para gravar a chave de API.",
         ) from exc
+
+
+@router.get("/embeddings")
+async def get_embeddings_status():
+    # Sempre 200: Ollama fora do ar e um estado esperado desta checagem.
+    return embeddings_status_service.get_embeddings_status()
 
 
 @router.get("/llm/models")

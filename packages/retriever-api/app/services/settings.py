@@ -1,5 +1,5 @@
 from app.dependencies import reset_llm_cache
-from app.providers.registry import get_provider
+from app.providers.registry import get_provider, provider_ids
 from app.settings_store import (
     EffectiveLlmConfig,
     default_base_url,
@@ -10,13 +10,10 @@ from app.settings_store import (
     write_settings,
 )
 
-KNOWN_PROVIDERS = {"ollama", "openrouter", "custom"}
-
-
 def _validate_provider(provider: str) -> None:
-    if provider not in KNOWN_PROVIDERS:
+    if provider not in provider_ids():
         raise ValueError(
-            f"Provedor invalido: {provider!r}. Use um destes: {', '.join(KNOWN_PROVIDERS)}."
+            f"Provedor invalido: {provider!r}. Use um destes: {', '.join(provider_ids())}."
         )
 
 
