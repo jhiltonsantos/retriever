@@ -1,4 +1,4 @@
-{#if embeddings.loaded && embeddings.status !== 'ready'}
+{#if embeddings.loaded && embeddings.status !== 'ready' && embeddings.provider === 'ollama'}
 	<div
 		role="status"
 		class="mx-8 mb-2 flex shrink-0 items-center gap-2 rounded-full bg-[var(--color-warning)]/10 px-4 py-2 text-xs text-[var(--color-warning)]"
@@ -7,7 +7,7 @@
 		{#if embeddings.status === 'model_missing'}
 			<span>
 				Ollama detectado, mas falta o modelo de embeddings. Rode
-				<code class="text-xs">ollama pull nomic-embed-text</code> e valide em Configurações.
+				<code class="text-xs">ollama pull {embeddings.model}</code> e valide em Configurações.
 			</span>
 		{:else}
 			<span>
@@ -15,7 +15,7 @@
 				<a class="link" href={OLLAMA_DOWNLOAD_URL} onclick={externalLinkHandler(OLLAMA_DOWNLOAD_URL)}>
 					Ollama
 				</a>
-				e baixe o modelo <code class="text-xs">nomic-embed-text</code>.
+				e baixe o modelo <code class="text-xs">{embeddings.model}</code>.
 			</span>
 		{/if}
 	</div>

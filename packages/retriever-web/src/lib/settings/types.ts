@@ -1,4 +1,5 @@
-export type LlmProviderId = 'ollama' | 'openrouter' | 'custom';
+// Ids vindos do backend (fonte unica: app/providers/registry.py).
+export type LlmProviderId = string;
 
 export type ProviderConfig = {
 	model: string | null;

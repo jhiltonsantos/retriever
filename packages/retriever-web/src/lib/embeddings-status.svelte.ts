@@ -2,6 +2,8 @@ import { getEmbeddingsStatus } from '$lib/api/embeddings';
 import type { EmbeddingsStatus } from '$lib/api/types';
 
 let status = $state<EmbeddingsStatus>('unreachable');
+let provider = $state('ollama');
+let model = $state('nomic-embed-text');
 let checking = $state(false);
 let loaded = $state(false);
 let inflight: Promise<void> | null = null;
@@ -10,6 +12,12 @@ export function getEmbeddingsState() {
 	return {
 		get status() {
 			return status;
+		},
+		get provider() {
+			return provider;
+		},
+		get model() {
+			return model;
 		},
 		get checking() {
 			return checking;
@@ -26,6 +34,8 @@ export function refreshEmbeddingsStatus(): Promise<void> {
 	inflight = getEmbeddingsStatus()
 		.then((res) => {
 			status = res.status;
+			provider = res.provider;
+			model = res.model;
 		})
 		.catch(() => {
 			status = 'unreachable';

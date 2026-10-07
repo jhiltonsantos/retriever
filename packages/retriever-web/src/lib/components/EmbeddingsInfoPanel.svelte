@@ -23,9 +23,9 @@
 
 	<dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 pt-1 text-sm">
 		<dt class="text-[var(--color-outline)]">Provedor</dt>
-		<dd>Ollama local</dd>
+		<dd>{embeddings.provider === 'ollama' ? 'Ollama local' : embeddings.provider}</dd>
 		<dt class="text-[var(--color-outline)]">Modelo</dt>
-		<dd><code class="text-sm">nomic-embed-text</code></dd>
+		<dd><code class="text-sm">{embeddings.model}</code></dd>
 		<dt class="text-[var(--color-outline)]">Status</dt>
 		<dd>
 			{#if embeddings.checking && !embeddings.loaded}
@@ -40,7 +40,7 @@
 		</dd>
 	</dl>
 
-	{#if embeddings.status !== 'ready'}
+	{#if embeddings.status !== 'ready' && embeddings.provider === 'ollama'}
 		<div class="flex flex-col gap-3 rounded-2xl bg-[var(--color-surface-container)] p-4 text-sm">
 			<p class="m-0 font-semibold text-[var(--color-on-surface)]">Como configurar</p>
 			<ol class="m-0 flex list-decimal flex-col gap-2 pl-5 text-[var(--color-on-surface-variant)]">
@@ -53,7 +53,7 @@
 				</li>
 				<li>
 					No terminal, baixe o modelo:
-					<code class="text-sm">ollama pull nomic-embed-text</code>
+					<code class="text-sm">ollama pull {embeddings.model}</code>
 				</li>
 				<li>Clique em Validar para o Retriever conferir.</li>
 			</ol>
